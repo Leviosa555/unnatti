@@ -10,7 +10,29 @@ require_once dirname(__DIR__) . '/includes/functions.php';
 header('Content-Type: application/json');
 requireLogin();
 
-$q = sanitize($_GET['q'] ?? '');
+$q             = sanitize($_GET['q'] ?? '');
+$requestedType = sanitize($_GET['item_type'] ?? '');
+
+// Determine item_type condition:
+// 'product': only finished boutique products/garments
+// 'material': only raw fabrics/materials for inward stock
+// 'all': all items
+// default based on active profile:
+if ($requestedType === 'product') {
+    $typeCondition = "(p.item_type = 'product' OR p.item_type IS NULL)";
+} elseif ($requestedType === 'material') {
+    $typeCondition = "p.item_type = 'material'";
+} elseif ($requestedType === 'all') {
+    $typeCondition = "1=1";
+} else {
+    $activeProfile = getActiveProfile();
+    if ($activeProfile === 'fashion_kingdom') {
+        $typeCondition = "p.item_type = 'material'";
+    } else {
+        // Unnatti boutique retail profile: ONLY show finished boutique products
+        $typeCondition = "(p.item_type = 'product' OR p.item_type IS NULL)";
+    }
+}
 
 if (strlen($q) < 1) {
     $results = db()->fetchAll(
@@ -26,6 +48,7 @@ if (strlen($q) < 1) {
          LEFT JOIN categories c ON p.category_id = c.id
          LEFT JOIN categories sc ON p.subcategory_id = sc.id
          WHERE pv.status = 'active' AND p.status = 'active'
+           AND $typeCondition
          ORDER BY pv.current_stock DESC, p.name ASC
          LIMIT 20"
     );
@@ -44,6 +67,7 @@ if (strlen($q) < 1) {
          LEFT JOIN categories c ON p.category_id = c.id
          LEFT JOIN categories sc ON p.subcategory_id = sc.id
          WHERE pv.status = 'active' AND p.status = 'active'
+           AND $typeCondition
            AND (pv.sku LIKE ? OR p.name LIKE ? OR p.brand LIKE ? OR c.name LIKE ? OR sc.name LIKE ?)
          ORDER BY pv.current_stock DESC, p.name ASC
          LIMIT 20",

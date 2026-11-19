@@ -22,7 +22,10 @@ validateCSRF();
 // ── Parse inputs ───────────────────────────────────
 $saleDate          = sanitize($post['sale_date'] ?? date('Y-m-d'));
 $customerName      = sanitize($post['customer_name'] ?? 'Walk-In Customer');
-$customerMobile    = sanitize($post['customer_mobile'] ?? '');
+$customerMobile    = cleanMobile($post['customer_mobile'] ?? '');
+if ($customerMobile && !isValidMobile($customerMobile)) {
+    jsonError('Customer mobile number must be exactly 10 digits.');
+}
 $customerAddress   = sanitize($post['customer_address'] ?? '');
 $customerEmail     = sanitize($post['customer_email'] ?? '');
 $customerType      = in_array($post['customer_type'] ?? '', ['retail', 'wholesale', 'walk-in']) ? $post['customer_type'] : 'retail';

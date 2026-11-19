@@ -8,15 +8,15 @@ $errors = []; $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validateCSRF();
     $name    = sanitize($_POST['name'] ?? '');
-    $mobile  = sanitize($_POST['mobile'] ?? '');
+    $mobile  = cleanMobile($_POST['mobile'] ?? '');
     $email   = sanitize($_POST['email'] ?? '');
     $address = sanitize($_POST['address'] ?? '');
-    $type    = in_array($_POST['type']??'','retail','wholesale','walk-in') ? $_POST['type'] : 'retail';
+    $type    = in_array($_POST['type']??'', ['retail','wholesale','walk-in']) ? $_POST['type'] : 'retail';
     $gstin   = sanitize($_POST['gstin'] ?? '');
     $notes   = sanitize($_POST['notes'] ?? '');
 
     if (empty($name)) $errors[] = 'Customer name is required.';
-    if ($mobile && !preg_match('/^[0-9]{10}$/', $mobile)) $errors[] = 'Invalid mobile number (10 digits).';
+    if ($mobile && !isValidMobile($mobile)) $errors[] = 'Mobile number must be exactly 10 digits.';
     if ($email && !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Invalid email address.';
 
     if (empty($errors)) {
@@ -54,7 +54,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
     <div class="card-body">
       <div class="form-row cols-2">
         <div class="form-group"><label class="form-label">Full Name <span class="required">*</span></label><input type="text" name="name" class="form-control" required value="<?= e($_POST['name']??'') ?>"></div>
-        <div class="form-group"><label class="form-label">Mobile</label><input type="tel" name="mobile" class="form-control" placeholder="10-digit number" value="<?= e($_POST['mobile']??'') ?>"></div>
+        <div class="form-group"><label class="form-label">Mobile</label><input type="tel" name="mobile" class="form-control" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)" value="<?= e($_POST['mobile']??'') ?>"></div>
       </div>
       <div class="form-row cols-2">
         <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-control" value="<?= e($_POST['email']??'') ?>"></div>

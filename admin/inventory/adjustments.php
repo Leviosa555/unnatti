@@ -50,7 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             logActivity("Stock adjustment: $adjNo ({$qtyChange} units for {$variant['product_name']})", 'stock', $adjId, 'adjustment');
             $_SESSION['flash_success'] = "Adjustment $adjNo recorded successfully. Stock updated.";
-            header('Location: ' . APP_URL . '/admin/products/index.php'); 
+            
+            $activeProfile = getActiveProfile();
+            if ($activeProfile === 'fashion_kingdom' || ($variant['item_type'] ?? '') === 'material') {
+                header('Location: ' . APP_URL . '/admin/purchases/materials.php'); 
+            } else {
+                header('Location: ' . APP_URL . '/admin/products/index.php'); 
+            }
             exit;
         } catch (Exception $e) {
             db()->rollback();
@@ -76,8 +82,9 @@ if ($prefillId) {
     );
 }
 
+$activeProfile = getActiveProfile();
 $pageTitle  = 'Stock Adjustment';
-$activePage = 'products';
+$activePage = ($activeProfile === 'fashion_kingdom') ? 'materials' : 'products';
 include dirname(dirname(__DIR__)) . '/includes/header.php';
 ?>
 <script>window.APP_URL = '<?= APP_URL ?>';</script>
@@ -147,10 +154,16 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
 <div class="page-header">
   <div class="page-header-left">
     <h1 class="page-title"><i class="fas fa-sliders-h text-primary" style="margin-right:10px"></i>Stock Adjustment</h1>
-    <p class="page-subtitle">Manually correct stock levels, record physical counts, or write off damaged boutique garments</p>
+    <p class="page-subtitle">
+      <?= ($activeProfile === 'fashion_kingdom') ? 'Manually correct fabric meters &amp; tailoring material counts' : 'Manually correct stock levels, record physical counts, or write off damaged boutique garments' ?>
+    </p>
   </div>
   <div class="page-header-right">
-    <a href="<?= APP_URL ?>/admin/products/index.php" class="btn btn-light"><i class="fas fa-arrow-left"></i> Back to Shop Products</a>
+    <?php if ($activeProfile === 'fashion_kingdom'): ?>
+      <a href="<?= APP_URL ?>/admin/purchases/materials.php" class="btn btn-light"><i class="fas fa-arrow-left"></i> Back to Materials &amp; Stock</a>
+    <?php else: ?>
+      <a href="<?= APP_URL ?>/admin/products/index.php" class="btn btn-light"><i class="fas fa-arrow-left"></i> Back to Shop Products</a>
+    <?php endif; ?>
   </div>
 </div>
 

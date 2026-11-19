@@ -20,7 +20,7 @@ validateCSRF();
 $variantId = (int)($_POST['variant_id'] ?? 0);
 $adjustmentType = sanitize($_POST['adjustment_type'] ?? ''); // 'add' or 'subtract'
 $qtyChange = (int)($_POST['qty_change'] ?? 0);
-$reason = sanitize($_POST['reason'] ?? '');
+$reason = !empty($_POST['reason']) ? sanitize($_POST['reason']) : 'Manual adjustment';
 
 // Validation
 if (!$variantId) {
@@ -33,10 +33,6 @@ if (!in_array($adjustmentType, ['add', 'subtract'])) {
 
 if ($qtyChange <= 0) {
     die(json_encode(['success' => false, 'message' => 'Quantity must be greater than zero']));
-}
-
-if (empty($reason)) {
-    die(json_encode(['success' => false, 'message' => 'Reason is required for stock adjustment']));
 }
 
 try {

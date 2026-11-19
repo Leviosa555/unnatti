@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validateCSRF();
     $fullName      = sanitize($_POST['full_name'] ?? '');
     $username      = sanitize($_POST['username'] ?? '');
-    $mobile        = sanitize($_POST['mobile'] ?? '');
+    $mobile        = cleanMobile($_POST['mobile'] ?? '');
     $email         = sanitize($_POST['email'] ?? '');
     $canEnterStock = isset($_POST['can_enter_stock']) ? 1 : 0;
     $canDiscount   = isset($_POST['can_apply_discount']) ? 1 : 0;
@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($fullName)) $errors[] = 'Full name required.';
     if (empty($username)) $errors[] = 'Username required.';
+    if ($mobile && !isValidMobile($mobile)) $errors[] = 'Mobile number must be exactly 10 digits.';
     if ($username !== $emp['username']) {
         $dup = db()->fetchOne("SELECT id FROM users WHERE username=? AND id!=?", [$username, $id]);
         if ($dup) $errors[] = "Username taken.";
@@ -66,7 +67,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
         <div class="form-group"><label class="form-label">Username <span class="required">*</span></label><input type="text" name="username" class="form-control" required value="<?= e($emp['username']) ?>"></div>
       </div>
       <div class="form-row cols-2">
-        <div class="form-group"><label class="form-label">Mobile</label><input type="tel" name="mobile" class="form-control" value="<?= e($emp['mobile']??'') ?>"></div>
+        <div class="form-group"><label class="form-label">Mobile</label><input type="tel" name="mobile" class="form-control" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)" value="<?= e($emp['mobile']??'') ?>"></div>
         <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-control" value="<?= e($emp['email']??'') ?>"></div>
       </div>
       <div class="form-row cols-2">

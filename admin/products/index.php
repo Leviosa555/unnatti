@@ -8,6 +8,12 @@ require_once dirname(dirname(__DIR__)) . '/includes/auth.php';
 require_once dirname(dirname(__DIR__)) . '/includes/functions.php';
 requireAdmin();
 
+$activeProfile = getActiveProfile();
+if ($activeProfile === 'fashion_kingdom' && (!isset($_GET['profile']) || $_GET['profile'] !== 'unnatti')) {
+    header('Location: ' . APP_URL . '/admin/purchases/materials.php');
+    exit;
+}
+
 $pageTitle  = 'Shop Products';
 $activePage = 'products';
 $breadcrumb = [['label' => 'Shop Products']];
@@ -153,9 +159,11 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
   <div class="stat-card stat-card-success">
     <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
     <div class="stat-body">
-      <div class="stat-value" style="font-size:1.1rem"><?= formatCurrency($totalValue) ?></div>
-      <div class="stat-label">Stock Cost Value</div>
-      <div class="stat-trend"><i class="fas fa-tag"></i> Sell: <?= formatCurrency($totalSaleVal) ?></div>
+      <div class="stat-value" style="font-size:1.1rem"><?= formatCurrency($totalSaleVal) ?></div>
+      <div class="stat-label">Stock Value (MRP)</div>
+      <?php if ($totalValue > 0): ?>
+        <div class="stat-trend"><i class="fas fa-tag"></i> Cost: <?= formatCurrency($totalValue) ?></div>
+      <?php endif; ?>
     </div>
   </div>
 </div>
@@ -180,7 +188,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
   <!-- Search & Filters -->
   <form method="GET" class="table-filters">
     <input type="hidden" name="filter" value="<?= e($filter) ?>">
-    <input type="text" name="search" class="form-control" placeholder="Search SKU, product name, brand..." value="<?= e($search) ?>" style="min-width:240px">
+    <input type="text" name="search" class="form-control" placeholder="Search SKU, product name..." value="<?= e($search) ?>" style="min-width:240px">
     <select name="category" class="form-select">
       <option value="">All Categories</option>
       <?php foreach ($categories as $cat): ?>
@@ -208,8 +216,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
           <th class="text-center">Size / Unit</th>
           <th class="text-center">Current Stock</th>
           <th class="text-center">Min Alert</th>
-          <th class="text-right">Cost / Unit</th>
-          <th class="text-right">Sell Price</th>
+          <th class="text-right">Price / MRP</th>
           <th class="text-right">Stock Value</th>
           <th class="text-center">Total Sold</th>
           <th class="text-right no-print" style="width:115px;min-width:115px">Actions</th>
@@ -218,7 +225,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
       <tbody>
         <?php if (empty($stocks)): ?>
         <tr>
-          <td colspan="11">
+          <td colspan="10">
             <div class="empty-state">
               <i class="fas fa-tshirt"></i>
               <h4>No shop products found</h4>
@@ -267,9 +274,8 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
             <?php endif; ?>
           </td>
           <td class="text-center text-muted"><?= (int)$s['min_stock_alert'] ?></td>
-          <td class="text-right"><?= formatCurrency($s['purchase_price_with_gst']) ?></td>
           <td class="text-right font-weight-bold" style="color:#0f172a"><?= formatCurrency($s['selling_price']) ?></td>
-          <td class="text-right"><strong><?= formatCurrency($s['purchase_price_with_gst'] * $s['current_stock']) ?></strong></td>
+          <td class="text-right"><strong><?= formatCurrency($s['selling_price'] * $s['current_stock']) ?></strong></td>
           <td class="text-center"><span class="badge badge-secondary" style="font-weight:600">[ <?= number_format($s['total_sold']) ?> sold ]</span></td>
           <td class="text-right no-print">
             <div class="table-actions">

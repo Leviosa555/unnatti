@@ -4,6 +4,13 @@ require_once dirname(dirname(__DIR__)) . '/includes/auth.php';
 require_once dirname(dirname(__DIR__)) . '/includes/functions.php';
 requireAdmin();
 
+$activeProfile = getActiveProfile();
+if ($activeProfile === 'fashion_kingdom') {
+    $q = !empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '';
+    header('Location: ' . APP_URL . '/admin/purchases/material_movements.php' . $q);
+    exit;
+}
+
 $variantId = (int)($_GET['variant_id'] ?? 0);
 $search    = sanitize($_GET['search'] ?? '');
 $type      = sanitize($_GET['type'] ?? '');

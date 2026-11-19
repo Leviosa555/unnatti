@@ -388,6 +388,26 @@ function uploadImage(array $file, string $destination, string $prefix = '') {
     return false;
 }
 // =====================================================
+// MOBILE NUMBER HELPERS
+// =====================================================
+
+/**
+ * Validate that a mobile/phone number contains exactly 10 digits
+ */
+function isValidMobile(?string $mobile): bool {
+    if ($mobile === null || trim($mobile) === '') return false;
+    return (bool)preg_match('/^[0-9]{10}$/', trim($mobile));
+}
+
+/**
+ * Clean a mobile number string to digits only, up to 10 characters
+ */
+function cleanMobile(?string $mobile): string {
+    if ($mobile === null) return '';
+    return substr(preg_replace('/\D/', '', $mobile), 0, 10);
+}
+
+// =====================================================
 // JSON RESPONSE HELPERS (for API endpoints)
 // =====================================================
 
@@ -406,35 +426,28 @@ function jsonError(string $message = 'Error', int $code = 400, $data = null) {
 
 /**
  * Get active business profile: 'unnatti' or 'fashion_kingdom'
+ * Persisted in session and strictly maintained until explicitly changed via ?profile= from the dropdown
  */
 function getActiveProfile(): string {
-    $currentPath = $_SERVER['PHP_SELF'] ?? '';
-
+    // Explicit profile switch from dropdown menu
     if (isset($_GET['profile'])) {
         $profile = ($_GET['profile'] === 'fashion_kingdom') ? 'fashion_kingdom' : 'unnatti';
         $_SESSION['active_profile'] = $profile;
         return $profile;
     }
 
-    // Auto-detect based on supplier section paths
+    // If active profile is already stored in session, strictly preserve it
+    if (!empty($_SESSION['active_profile'])) {
+        return $_SESSION['active_profile'];
+    }
+
+    // Default fallback only on initial fresh session
+    $currentPath = $_SERVER['PHP_SELF'] ?? '';
     if (strpos($currentPath, '/admin/purchases') !== false || strpos($currentPath, '/admin/suppliers') !== false) {
         $_SESSION['active_profile'] = 'fashion_kingdom';
         return 'fashion_kingdom';
     }
 
-    // Dedicated Unnatti paths
-    if (strpos($currentPath, '/admin/dashboard') !== false || 
-        strpos($currentPath, '/admin/billing') !== false || 
-        strpos($currentPath, '/admin/customers') !== false || 
-        strpos($currentPath, '/admin/products') !== false || 
-        strpos($currentPath, '/admin/stock') !== false || 
-        strpos($currentPath, '/admin/inventory') !== false || 
-        strpos($currentPath, '/admin/reports') !== false || 
-        strpos($currentPath, '/admin/employees') !== false || 
-        strpos($currentPath, '/admin/settings') !== false) {
-        $_SESSION['active_profile'] = 'unnatti';
-        return 'unnatti';
-    }
-
-    return $_SESSION['active_profile'] ?? 'unnatti';
+    $_SESSION['active_profile'] = 'unnatti';
+    return 'unnatti';
 }

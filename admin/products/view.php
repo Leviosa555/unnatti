@@ -26,6 +26,65 @@ $movements = db()->fetchAll(
 $pageTitle = e($product['name']); $activePage='products';
 include dirname(dirname(__DIR__)) . '/includes/header.php';
 ?>
+<script>window.APP_URL='<?= APP_URL ?>';</script>
+
+<!-- Stock Adjustment Modal -->
+<div class="modal-overlay" id="stockAdjustModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title"><i class="fas fa-boxes text-primary"></i> Adjust Stock</span>
+      <button class="modal-close" onclick="closeModal('stockAdjustModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#f1f5f9;padding:12px;border-radius:6px;margin-bottom:16px">
+        <div style="font-size:0.82rem;color:#64748b">Product / SKU</div>
+        <div style="font-weight:600;color:#1e293b" id="adjustSku"></div>
+      </div>
+      
+      <?php if (count($variants) > 1): ?>
+      <div class="form-group">
+        <label class="form-label">Select Size / Variant <span class="required">*</span></label>
+        <select id="adjustVariantSelect" class="form-select" onchange="onVariantSelectChange(this.value)">
+          <?php foreach ($variants as $v): ?>
+          <option value="<?= $v['id'] ?>" data-sku="<?= e($v['sku']) ?>" data-size="<?= e($v['size']) ?>" data-stock="<?= (int)$v['current_stock'] ?>">
+            <?= e($v['size']) ?> (<?= e($v['sku']) ?>) — Current: <?= (int)$v['current_stock'] ?>
+          </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <?php endif; ?>
+
+      <div class="form-group">
+        <label class="form-label">Current Stock</label>
+        <input type="number" id="currentStockDisplay" class="form-control" readonly disabled style="background:#f8fafc">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Adjustment Type <span class="required">*</span></label>
+        <select id="adjustType" class="form-select" onchange="updateAdjustPreview()">
+          <option value="add">Add Stock (+)</option>
+          <option value="subtract">Remove Stock (-)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Quantity <span class="required">*</span></label>
+        <input type="number" id="adjustQty" class="form-control" min="1" value="1" oninput="updateAdjustPreview()" required>
+      </div>
+
+      <div style="background:#eff6ff;padding:12px;border-radius:6px;border-left:3px solid #2563eb;margin-bottom:0">
+        <div style="font-size:0.85rem;color:#1e40af;font-weight:500">New Stock: <span id="newStockPreview" style="font-size:1.1rem">0</span></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-light" onclick="closeModal('stockAdjustModal')">Cancel</button>
+      <button class="btn btn-primary" id="confirmAdjustBtn" onclick="confirmStockAdjust()">
+        <i class="fas fa-check"></i> Adjust Stock
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="page-header">
   <div class="page-header-left">
     <h1 class="page-title"><i class="fas fa-box text-primary" style="margin-right:10px"></i><?= e($product['name']) ?></h1>
@@ -33,7 +92,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
   </div>
   <div class="page-header-right">
     <a href="<?= APP_URL ?>/admin/products/edit.php?id=<?= $id ?>" class="btn btn-outline-primary btn-sm"><i class="fas fa-edit"></i> Edit</a>
-    <a href="<?= APP_URL ?>/admin/purchases/add.php" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add Stock</a>
+    <button type="button" class="btn btn-primary btn-sm" onclick="openAddStock()"><i class="fas fa-sliders-h"></i> Adjust</button>
     <a href="<?= APP_URL ?>/admin/products/index.php" class="btn btn-light btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
   </div>
 </div>
@@ -49,16 +108,20 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
         <table style="width:100%;border-collapse:collapse">
           <?php
           $fields = [
-            'Material Type / Brand' => $product['brand'] ?? '—',
-            'Category'    => $product['category_name'] ?? '—',
-            'Description' => $product['description'] ?? '—',
-            'Total Variants / Units' => count($variants),
-            'Total Stock' => number_format($totalStock).' ('.($variants[0]['size'] ?? 'units').')',
-            'Added'       => formatDate($product['created_at']),
+            'Category' => $product['category_name'] ?? '—',
           ];
+          if (!empty($product['brand'])) {
+            $fields['Brand'] = $product['brand'];
+          }
+          if (!empty($product['description'])) {
+            $fields['Description'] = $product['description'];
+          }
+          $fields['Total Sizes / Units'] = count($variants);
+          $fields['Total Stock'] = number_format($totalStock) . ' units';
+          $fields['Added'] = formatDate($product['created_at']);
           foreach ($fields as $label => $val):
           ?>
-          <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:9px 0;color:#64748b;font-size:0.82rem;font-weight:600;width:130px"><?= $label ?></td><td style="padding:9px 0;font-size:0.85rem"><?= e($val) ?></td></tr>
+          <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:9px 0;color:#64748b;font-size:0.82rem;font-weight:600;width:140px"><?= $label ?></td><td style="padding:9px 0;font-size:0.85rem"><?= e($val) ?></td></tr>
           <?php endforeach; ?>
         </table>
       </div>
@@ -69,18 +132,46 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
     <div class="card">
       <div class="card-header"><span class="card-title"><i class="fas fa-layer-group"></i> Variants & Pricing</span></div>
       <div class="table-wrapper">
+        <?php
+          $hasCost = false;
+          foreach ($variants as $v) {
+            if ($v['purchase_price_with_gst'] > 0) {
+              $hasCost = true;
+              break;
+            }
+          }
+        ?>
         <table>
-          <thead><tr><th>SKU</th><th>Unit / Size</th><th class="text-right">Cost+GST</th><th class="text-right">Sell Price</th><th class="text-right">Margin%</th><th class="text-center">Stock</th></tr></thead>
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Unit / Size</th>
+              <?php if ($hasCost): ?>
+                <th class="text-right">Cost+GST</th>
+                <th class="text-right">Sell Price</th>
+                <th class="text-right">Margin%</th>
+              <?php else: ?>
+                <th class="text-right">Selling Price / MRP</th>
+                <th class="text-center">Min Alert</th>
+              <?php endif; ?>
+              <th class="text-center">Stock</th>
+            </tr>
+          </thead>
           <tbody>
             <?php foreach ($variants as $v):
               $margin = $v['purchase_price_with_gst'] > 0 ? round(($v['selling_price']-$v['purchase_price_with_gst'])/$v['selling_price']*100,1) : 0;
             ?>
             <tr>
               <td><span class="sku-badge"><?= e($v['sku']) ?></span></td>
-              <td><?= e($v['size']) ?></td>
-              <td class="text-right"><?= formatCurrency($v['purchase_price_with_gst']) ?></td>
-              <td class="text-right text-bold"><?= formatCurrency($v['selling_price']) ?></td>
-              <td class="text-right"><span class="badge badge-<?= $margin>=20?'success':($margin>=10?'warning':'danger') ?>"><?= $margin ?>%</span></td>
+              <td><strong><?= e($v['size']) ?></strong></td>
+              <?php if ($hasCost): ?>
+                <td class="text-right"><?= formatCurrency($v['purchase_price_with_gst']) ?></td>
+                <td class="text-right text-bold" style="color:#2563eb"><?= formatCurrency($v['selling_price']) ?></td>
+                <td class="text-right"><span class="badge badge-<?= $margin>=20?'success':($margin>=10?'warning':'danger') ?>"><?= $margin ?>%</span></td>
+              <?php else: ?>
+                <td class="text-right text-bold" style="color:#2563eb;font-size:0.95rem"><?= formatCurrency($v['selling_price']) ?></td>
+                <td class="text-center text-muted"><?= (int)$v['min_stock_alert'] ?></td>
+              <?php endif; ?>
               <td class="text-center">
                 <?php if ($v['current_stock']==0): ?><span class="badge badge-danger">0</span>
                 <?php elseif ($v['current_stock']<=$v['min_stock_alert']): ?><span class="badge badge-warning"><?= $v['current_stock'] ?></span>
@@ -121,4 +212,105 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
     </table>
   </div>
 </div>
+
+<script>
+const allVariants = <?= json_encode(array_map(function($v) {
+    return [
+        'id'    => (int)$v['id'],
+        'sku'   => $v['sku'],
+        'size'  => $v['size'],
+        'stock' => (int)$v['current_stock']
+    ];
+}, $variants)) ?>;
+
+let adjustVariantId = null;
+let adjustCurrentStock = 0;
+
+function openAddStock() {
+  if (!allVariants || !allVariants.length) return;
+  const v = allVariants[0];
+  showStockAdjustModal(v.id, v.sku + (v.size ? ' (' + v.size + ')' : ''), v.stock);
+}
+
+function onVariantSelectChange(variantId) {
+  const v = allVariants.find(item => item.id == variantId);
+  if (v) {
+    adjustVariantId = v.id;
+    adjustCurrentStock = v.stock;
+    document.getElementById('adjustSku').textContent = v.sku + (v.size ? ' (' + v.size + ')' : '');
+    document.getElementById('currentStockDisplay').value = v.stock;
+    updateAdjustPreview();
+  }
+}
+
+function showStockAdjustModal(variantId, skuLabel, currentStock) {
+  adjustVariantId = variantId;
+  adjustCurrentStock = currentStock;
+
+  document.getElementById('adjustSku').textContent = skuLabel;
+  document.getElementById('currentStockDisplay').value = currentStock;
+  document.getElementById('adjustQty').value = 1;
+  document.getElementById('adjustType').value = 'add';
+
+  const selectEl = document.getElementById('adjustVariantSelect');
+  if (selectEl) {
+    selectEl.value = variantId;
+  }
+
+  updateAdjustPreview();
+  openModal('stockAdjustModal');
+}
+
+function updateAdjustPreview() {
+  const type = document.getElementById('adjustType').value;
+  const qty = parseInt(document.getElementById('adjustQty').value) || 0;
+  const newStock = type === 'add' ? adjustCurrentStock + qty : adjustCurrentStock - qty;
+
+  document.getElementById('newStockPreview').textContent = Math.max(0, newStock);
+  document.getElementById('newStockPreview').style.color = newStock < 0 ? '#dc2626' : '#059669';
+}
+
+function confirmStockAdjust() {
+  const type = document.getElementById('adjustType').value;
+  const qty = parseInt(document.getElementById('adjustQty').value);
+
+  if (!qty || qty < 1) {
+    showToast('Please enter a valid quantity', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('confirmAdjustBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner spinner-sm"></span> Adjusting...';
+
+  const formData = new FormData();
+  formData.append('variant_id', adjustVariantId);
+  formData.append('adjustment_type', type);
+  formData.append('qty_change', qty);
+  formData.append('reason', 'Manual adjustment');
+  formData.append('csrf_token', '<?= csrfToken() ?>');
+
+  fetch(APP_URL + '/api/adjust_stock.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      showToast(data.message, 'success');
+      closeModal('stockAdjustModal');
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      showToast(data.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check"></i> Adjust Stock';
+    }
+  })
+  .catch(err => {
+    showToast('Failed to adjust stock. Please try again.', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check"></i> Adjust Stock';
+  });
+}
+</script>
 <?php include dirname(dirname(__DIR__)) . '/includes/footer.php'; ?>

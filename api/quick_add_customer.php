@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 validateCSRF();
 
 $name    = sanitize($_POST['name'] ?? '');
-$mobile  = sanitize($_POST['mobile'] ?? '');
+$mobile  = cleanMobile($_POST['mobile'] ?? '');
 $email   = sanitize($_POST['email'] ?? '');
 $address = sanitize($_POST['address'] ?? '');
 $type    = in_array($_POST['type'] ?? '', ['retail', 'wholesale', 'walk-in']) ? $_POST['type'] : 'retail';
@@ -26,8 +26,8 @@ $notes   = sanitize($_POST['notes'] ?? '');
 if (empty($name)) {
     jsonError('Customer name is required.');
 }
-if ($mobile && !preg_match('/^[0-9]{10}$/', $mobile)) {
-    jsonError('Invalid mobile number (must be 10 digits).');
+if ($mobile && !isValidMobile($mobile)) {
+    jsonError('Invalid mobile number (must be exactly 10 digits).');
 }
 if ($email && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     jsonError('Invalid email address.');

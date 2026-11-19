@@ -103,13 +103,13 @@ $activePage   = $activePage ?? '';
                             <?php endif; ?>
                         </div>
                         <?php if ($notifLowStockCount > 0): ?>
-                        <a href="<?= APP_URL ?>/admin/products/index.php?filter=low_stock" class="dropdown-item">
+                        <a href="<?= APP_URL ?>/<?= ($activeProfile === 'fashion_kingdom') ? 'admin/purchases/materials.php?filter=low_stock' : 'admin/products/index.php?filter=low_stock' ?>" class="dropdown-item">
                             <i class="fas fa-exclamation-triangle text-warning"></i>
                             <?= $notifLowStockCount ?> item(s) with low stock
                         </a>
                         <?php endif; ?>
                         <?php if ($notifOutStockCount > 0): ?>
-                        <a href="<?= APP_URL ?>/admin/products/index.php?filter=out_of_stock" class="dropdown-item">
+                        <a href="<?= APP_URL ?>/<?= ($activeProfile === 'fashion_kingdom') ? 'admin/purchases/materials.php?filter=out_of_stock' : 'admin/products/index.php?filter=out_of_stock' ?>" class="dropdown-item">
                             <i class="fas fa-times-circle text-danger"></i>
                             <?= $notifOutStockCount ?> item(s) out of stock
                         </a>

@@ -139,7 +139,7 @@ var canApplyDiscount = <?= canApplyDiscount() ? 'true' : 'false' ?>;
         <div class="form-row cols-2">
           <div class="form-group">
             <label class="form-label">Mobile Number</label>
-            <input type="tel" name="customer_mobile" id="customerMobile" class="form-control" placeholder="10-digit mobile" maxlength="10">
+            <input type="tel" name="customer_mobile" id="customerMobile" class="form-control" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
           </div>
           <div class="form-group">
             <label class="form-label">Email <small class="text-muted">(Optional)</small></label>
@@ -270,7 +270,7 @@ function searchBillingProduct(q) {
   }
 
   billingSearchTimer = setTimeout(function() {
-    const url = (window.APP_URL || '') + '/api/search_product.php?q=' + encodeURIComponent(q);
+    const url = (window.APP_URL || '') + '/api/search_product.php?q=' + encodeURIComponent(q) + '&item_type=product';
     fetch(url, { headers: { 'Accept': 'application/json' } })
       .then(function(res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -283,11 +283,8 @@ function searchBillingProduct(q) {
             const catStr = (product.category_name ? product.category_name + (product.subcategory_name ? ' › ' + product.subcategory_name : '') : '');
             const isOutOfStock = parseInt(product.current_stock) <= 0;
             const stockColor = isOutOfStock ? '#dc2626' : (product.current_stock <= 5 ? '#d97706' : '#059669');
-            const unitLabel = product.size || 'Unit';
-            const isMaterial = (product.item_type === 'material' || product.size === 'Meter');
-            const typeBadge = isMaterial 
-              ? '<span class="badge badge-warning" style="font-size:0.7rem;"><i class="fas fa-scroll"></i> Fabric</span>'
-              : '<span class="badge badge-primary" style="font-size:0.7rem;"><i class="fas fa-tshirt"></i> Garment</span>';
+            const unitLabel = product.size || 'Standard';
+            const typeBadge = '<span class="badge badge-primary" style="font-size:0.7rem;"><i class="fas fa-tshirt"></i> Garment</span>';
 
             return '<div onclick="selectProductByIndex(' + idx + ')" ' +
                    'style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f1f5f9;font-size:0.85rem;background:#fff;" ' +

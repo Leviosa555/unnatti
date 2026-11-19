@@ -437,7 +437,7 @@ window.SHIRT_KIT = <?= json_encode($shirtMaterialsData) ?>;
             </div>
             <div class="form-group">
               <label class="form-label">Supplier Name <span class="required">*</span></label>
-              <input type="text" name="supplier_name" class="form-control" placeholder="e.g. Raymond Mills, Arvind Textiles..." list="supplierList" value="<?= e($_POST['supplier_name'] ?? '') ?>" required>
+              <input type="text" name="supplier_name" class="form-control" placeholder="e.g. Raymond Mills, Arvind Textiles..." list="supplierList" value="<?= e($_POST['supplier_name'] ?? ($_GET['supplier'] ?? '')) ?>" required>
               <datalist id="supplierList">
                 <?php foreach ($suppliers as $s): ?><option value="<?= e($s['name']) ?>"><?php endforeach; ?>
               </datalist>
@@ -857,7 +857,7 @@ function searchMainMaterial(q) {
   }
 
   materialSearchTimer = setTimeout(() => {
-    fetch(window.APP_URL + '/api/search_product.php?q=' + encodeURIComponent(q))
+    fetch(window.APP_URL + '/api/search_product.php?q=' + encodeURIComponent(q) + '&item_type=material')
       .then(res => res.json())
       .then(res => {
         if (!res.success || !res.data || res.data.length === 0) {

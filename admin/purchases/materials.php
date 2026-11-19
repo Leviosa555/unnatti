@@ -122,6 +122,24 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
 ?>
 <script>window.APP_URL='<?= APP_URL ?>';</script>
 
+<style>
+.materials-compact-table {
+  width: 100% !important;
+  border-collapse: collapse;
+}
+.materials-compact-table th {
+  padding: 10px 8px !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.materials-compact-table td {
+  padding: 10px 8px !important;
+  font-size: 0.84rem;
+  vertical-align: middle;
+}
+</style>
+
 <div class="page-header">
   <div class="page-header-left">
     <h1 class="page-title"><i class="fas fa-scroll text-primary" style="margin-right:10px"></i>Material Stock &amp; Inventory</h1>
@@ -221,16 +239,16 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
   <!-- 1. GROUPED CATEGORY VIEW (DEFAULT) -->
   <div id="viewCategoriesContainer">
     <div class="table-wrapper">
-      <table class="data-table">
+      <table class="data-table materials-compact-table">
         <thead>
           <tr>
-            <th style="min-width:240px">Garment Category &amp; Kit</th>
-            <th style="min-width:280px">Components Included</th>
-            <th class="text-center" style="width:150px">Available Stock</th>
-            <th class="text-center" style="width:120px">Sold &amp; Consumed</th>
-            <th class="text-center" style="width:120px">Total Inwarded</th>
-            <th class="text-right" style="width:130px">Category Valuation</th>
-            <th class="text-center" style="width:180px">Action</th>
+            <th style="width:23%;min-width:160px">Garment Category &amp; Kit</th>
+            <th style="width:28%;min-width:170px">Components Included</th>
+            <th class="text-center" style="width:13%;min-width:100px">Available Stock</th>
+            <th class="text-center" style="width:8%;min-width:65px" title="Sold &amp; Consumed">Consumed</th>
+            <th class="text-center" style="width:8%;min-width:65px" title="Total Inwarded">Inwarded</th>
+            <th class="text-right" style="width:9%;min-width:75px">Valuation</th>
+            <th class="text-center" style="width:11%;min-width:115px">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -249,52 +267,52 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
           ?>
           <tr style="cursor:pointer" onclick="openCategoryModal('<?= $grp['slug'] ?>')">
             <td>
-              <div style="display:flex;align-items:center;gap:12px">
-                <div style="width:44px;height:44px;border-radius:10px;background:<?= $grp['icon_bg'] ?>;color:<?= $grp['icon_color'] ?>;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:36px;height:36px;border-radius:8px;background:<?= $grp['icon_bg'] ?>;color:<?= $grp['icon_color'] ?>;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">
                   <i class="<?= $grp['icon'] ?>"></i>
                 </div>
                 <div>
-                  <strong style="font-size:0.98rem;color:#0f172a;display:block"><?= e($grp['name']) ?> Materials</strong>
-                  <span style="font-size:0.75rem;color:#64748b"><?= e($grp['description']) ?></span>
+                  <strong style="font-size:0.91rem;color:#0f172a;display:block;line-height:1.2"><?= e($grp['name']) ?> Materials</strong>
+                  <span style="font-size:0.72rem;color:#64748b"><?= e($grp['description']) ?></span>
                 </div>
               </div>
             </td>
             <td>
-              <div style="display:flex;flex-wrap:wrap;gap:4px">
+              <div style="display:flex;flex-wrap:wrap;gap:3px">
                 <?php foreach ($grp['items'] as $it): ?>
-                  <span class="badge badge-light" style="font-size:0.74rem;border:1px solid #cbd5e1;background:#f8fafc;padding:3px 8px">
+                  <span class="badge badge-light" style="font-size:0.71rem;border:1px solid #cbd5e1;background:#f8fafc;padding:2px 6px">
                     <?= e($it['product_name']) ?>
                   </span>
                 <?php endforeach; ?>
               </div>
-              <div style="font-size:0.72rem;color:#7c3aed;margin-top:4px">
-                <i class="fas fa-layer-group"></i> <?= $grp['total_sku'] ?> component(s) in this kit
+              <div style="font-size:0.7rem;color:#7c3aed;margin-top:3px">
+                <i class="fas fa-layer-group"></i> <?= $grp['total_sku'] ?> component(s)
               </div>
             </td>
             <td class="text-center" onclick="event.stopPropagation()">
               <?php if ($allOut): ?>
-                <span class="badge badge-danger" style="font-weight:700;background:#fef2f2;color:#dc2626;border:1px solid #fecaca">[ 0 available ] &bull; Out</span>
+                <span class="badge badge-danger" style="font-weight:700;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;padding:2px 7px;font-size:0.73rem">[ 0 available ] &bull; Out</span>
               <?php elseif ($hasLow): ?>
-                <span class="badge badge-warning" style="font-weight:700;background:#fffbeb;color:#b45309;border:1px solid #fde68a">[ <?= number_format($grp['total_stock']) ?> units ] &bull; Low</span>
+                <span class="badge badge-warning" style="font-weight:700;background:#fffbeb;color:#b45309;border:1px solid #fde68a;padding:2px 7px;font-size:0.73rem">[ <?= number_format($grp['total_stock']) ?> units ] &bull; Low</span>
               <?php else: ?>
-                <span class="badge badge-success" style="font-weight:700;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0">[ <?= number_format($grp['total_stock']) ?> units available ]</span>
+                <span class="badge badge-success" style="font-weight:700;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;padding:2px 7px;font-size:0.73rem">[ <?= number_format($grp['total_stock']) ?> available ]</span>
               <?php endif; ?>
             </td>
             <td class="text-center" onclick="event.stopPropagation()">
-              <span style="font-weight:600;color:#64748b"><?= number_format($grp['total_consumed']) ?> Units</span>
+              <span style="font-weight:600;color:#64748b;font-size:0.83rem"><?= number_format($grp['total_consumed']) ?></span>
             </td>
             <td class="text-center" onclick="event.stopPropagation()">
-              <span style="font-weight:600;color:#2563eb"><?= number_format($grp['total_inwarded']) ?> Units</span>
+              <span style="font-weight:600;color:#2563eb;font-size:0.83rem"><?= number_format($grp['total_inwarded']) ?></span>
             </td>
-            <td class="text-right" style="font-weight:700" onclick="event.stopPropagation()">
+            <td class="text-right" style="font-weight:700;font-size:0.88rem" onclick="event.stopPropagation()">
               <?= formatCurrency($grp['total_valuation']) ?>
             </td>
             <td class="text-center" onclick="event.stopPropagation()">
-              <div class="d-flex gap-1 justify-center">
-                <button type="button" class="btn btn-sm btn-primary" onclick="openCategoryModal('<?= $grp['slug'] ?>')" style="font-weight:600;font-size:0.8rem">
-                  <i class="fas fa-boxes"></i> View Materials
+              <div style="display:flex;gap:4px;justify-content:center;align-items:center;flex-wrap:nowrap">
+                <button type="button" class="btn btn-xs btn-primary" onclick="openCategoryModal('<?= $grp['slug'] ?>')" style="font-weight:600;font-size:0.76rem;padding:4px 9px;white-space:nowrap">
+                  <i class="fas fa-boxes"></i> View
                 </button>
-                <a href="<?= APP_URL ?>/admin/purchases/add.php" class="btn btn-sm btn-outline-success" title="Inward stock for this category" style="font-weight:600;font-size:0.8rem">
+                <a href="<?= APP_URL ?>/admin/purchases/add.php" class="btn btn-xs btn-outline-success" title="Inward stock for this category" style="font-weight:600;font-size:0.76rem;padding:4px 9px;white-space:nowrap">
                   <i class="fas fa-plus"></i> Inward
                 </a>
               </div>
@@ -310,19 +328,19 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
   <!-- 2. DETAILED ALL INDIVIDUAL MATERIALS VIEW (CAN BE TOGGLED) -->
   <div id="viewAllContainer" style="display:none">
     <div class="table-wrapper">
-      <table class="data-table" id="materialsTable">
+      <table class="data-table materials-compact-table" id="materialsTable">
         <thead>
           <tr>
-            <th>SKU</th>
-            <th>Material Name &amp; Spec</th>
-            <th>Category</th>
-            <th>Unit</th>
-            <th class="text-center">Available Stock</th>
-            <th class="text-center">Sold &amp; Consumed</th>
-            <th class="text-center">Total Inwarded</th>
-            <th class="text-right">Cost (incl GST)</th>
-            <th class="text-right">Stock Valuation</th>
-            <th class="text-center">Action</th>
+            <th style="width:12%;min-width:95px">SKU</th>
+            <th style="width:20%;min-width:130px">Material Name &amp; Spec</th>
+            <th style="width:10%;min-width:75px">Category</th>
+            <th class="text-center" style="width:6%;min-width:50px">Unit</th>
+            <th class="text-center" style="width:12%;min-width:90px">Available Stock</th>
+            <th class="text-center" style="width:8%;min-width:60px" title="Sold &amp; Consumed">Consumed</th>
+            <th class="text-center" style="width:8%;min-width:60px" title="Total Inwarded">Inwarded</th>
+            <th class="text-right" style="width:8%;min-width:70px">Cost (incl GST)</th>
+            <th class="text-right" style="width:8%;min-width:70px">Valuation</th>
+            <th class="text-center" style="width:8%;min-width:75px">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -341,41 +359,41 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
             $unitBadge = $m['size'] ?: 'Meter';
           ?>
           <tr>
-            <td><span class="sku-badge"><?= e($m['sku']) ?></span></td>
+            <td><span class="sku-badge" style="font-size:0.71rem;padding:2px 5px"><?= e($m['sku']) ?></span></td>
             <td>
-              <strong><?= e($m['product_name']) ?></strong>
+              <strong style="font-size:0.86rem"><?= e($m['product_name']) ?></strong>
               <?php if ($m['material_type']): ?>
-              <div style="font-size:0.75rem;color:#7c3aed"><i class="fas fa-tag"></i> <?= e($m['material_type']) ?></div>
+              <div style="font-size:0.71rem;color:#7c3aed"><i class="fas fa-tag"></i> <?= e($m['material_type']) ?></div>
               <?php endif; ?>
             </td>
-            <td><span class="badge badge-secondary"><?= e($m['category_name'] ?: 'Fabrics') ?></span></td>
-            <td><span class="badge badge-info"><?= e($unitBadge) ?></span></td>
+            <td><span class="badge badge-secondary" style="font-size:0.71rem;padding:2px 6px"><?= e($m['category_name'] ?: 'Fabrics') ?></span></td>
+            <td class="text-center"><span class="badge badge-info" style="font-size:0.71rem;padding:2px 6px"><?= e($unitBadge) ?></span></td>
             <td class="text-center">
               <?php if ($isOut): ?>
-                <span class="badge badge-danger" style="font-weight:700;background:#fef2f2;color:#dc2626;border:1px solid #fecaca">[ 0 available ]</span>
+                <span class="badge badge-danger" style="font-weight:700;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;font-size:0.72rem;padding:2px 6px">[ 0 available ]</span>
               <?php elseif ($isLow): ?>
-                <span class="badge badge-warning" style="font-weight:700;background:#fffbeb;color:#b45309;border:1px solid #fde68a">[ <?= $m['current_stock'] ?> available ] &bull; Low</span>
+                <span class="badge badge-warning" style="font-weight:700;background:#fffbeb;color:#b45309;border:1px solid #fde68a;font-size:0.72rem;padding:2px 6px">[ <?= $m['current_stock'] ?> ] &bull; Low</span>
               <?php else: ?>
-                <span class="badge badge-success" style="font-weight:700;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0">[ <?= $m['current_stock'] ?> available ]</span>
+                <span class="badge badge-success" style="font-weight:700;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;font-size:0.72rem;padding:2px 6px">[ <?= $m['current_stock'] ?> available ]</span>
               <?php endif; ?>
             </td>
             <td class="text-center">
-              <span style="font-weight:600;color:#64748b"><?= number_format($m['total_consumed']) ?> <?= e($unitBadge) ?></span>
+              <span style="font-weight:600;color:#64748b;font-size:0.82rem"><?= number_format($m['total_consumed']) ?></span>
             </td>
             <td class="text-center">
-              <span style="font-weight:600;color:#2563eb"><?= number_format($m['total_inwarded']) ?> <?= e($unitBadge) ?></span>
+              <span style="font-weight:600;color:#2563eb;font-size:0.82rem"><?= number_format($m['total_inwarded']) ?></span>
             </td>
-            <td class="text-right"><?= formatCurrency($m['purchase_price_with_gst']) ?> <small class="text-muted">(<?= $m['purchase_gst_pct'] ?>%)</small></td>
-            <td class="text-right" style="font-weight:700"><?= formatCurrency($val) ?></td>
+            <td class="text-right" style="font-size:0.82rem"><?= formatCurrency($m['purchase_price_with_gst']) ?> <small class="text-muted">(<?= $m['purchase_gst_pct'] ?>%)</small></td>
+            <td class="text-right" style="font-weight:700;font-size:0.84rem"><?= formatCurrency($val) ?></td>
             <td class="text-center">
-              <div class="table-actions">
-                <a href="<?= APP_URL ?>/admin/purchases/add.php?sku=<?= urlencode($m['sku']) ?>" class="btn-icon btn-icon-primary" title="Inward More Stock">
+              <div class="table-actions" style="justify-content:center;gap:3px">
+                <a href="<?= APP_URL ?>/admin/purchases/add.php?sku=<?= urlencode($m['sku']) ?>" class="btn-icon btn-sm btn-icon-primary" title="Inward More Stock">
                   <i class="fas fa-plus"></i>
                 </a>
-                <a href="<?= APP_URL ?>/admin/purchases/material_movements.php?variant_id=<?= $m['id'] ?>" class="btn-icon btn-icon-light" title="Material Movement Ledger">
+                <a href="<?= APP_URL ?>/admin/purchases/material_movements.php?variant_id=<?= $m['id'] ?>" class="btn-icon btn-sm btn-icon-light" title="Material Movement Ledger">
                   <i class="fas fa-history"></i>
                 </a>
-                <a href="<?= APP_URL ?>/admin/inventory/adjustments.php" class="btn-icon btn-icon-warning" title="Adjust Stock">
+                <a href="<?= APP_URL ?>/admin/inventory/adjustments.php?variant_id=<?= $m['id'] ?>" class="btn-icon btn-sm btn-icon-warning" title="Adjust Stock">
                   <i class="fas fa-sliders-h"></i>
                 </a>
               </div>
@@ -492,7 +510,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
                   <a href="<?= APP_URL ?>/admin/purchases/material_movements.php?variant_id=<?= $it['id'] ?>" class="btn btn-xs btn-light" title="Stock Movement Ledger" style="padding:3px 7px">
                     <i class="fas fa-history"></i>
                   </a>
-                  <a href="<?= APP_URL ?>/admin/inventory/adjustments.php" class="btn btn-xs btn-light" title="Adjust Stock" style="padding:3px 7px">
+                  <a href="<?= APP_URL ?>/admin/inventory/adjustments.php?variant_id=<?= $it['id'] ?>" class="btn btn-xs btn-light" title="Adjust Stock" style="padding:3px 7px">
                     <i class="fas fa-sliders-h"></i>
                   </a>
                 </div>

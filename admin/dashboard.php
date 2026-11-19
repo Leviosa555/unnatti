@@ -7,6 +7,13 @@ require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/includes/functions.php';
 requireAdmin();
 
+$activeProfile = getActiveProfile();
+// If Fashion Kingdom profile is active and not explicitly switching to Unnatti, route to Fashion Kingdom Hub
+if ($activeProfile === 'fashion_kingdom' && (!isset($_GET['profile']) || $_GET['profile'] !== 'unnatti')) {
+    header('Location: ' . APP_URL . '/admin/purchases/materials.php');
+    exit;
+}
+
 $pageTitle  = 'Admin Dashboard';
 $activePage = 'dashboard';
 $breadcrumb = [['label' => 'Dashboard']];

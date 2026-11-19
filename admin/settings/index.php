@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'business_name'           => sanitize($_POST['business_name'] ?? ''),
         'business_tagline'        => sanitize($_POST['business_tagline'] ?? ''),
         'business_address'        => sanitize($_POST['business_address'] ?? ''),
-        'business_phone'          => sanitize($_POST['business_phone'] ?? ''),
+        'business_phone'          => cleanMobile($_POST['business_phone'] ?? ''),
         'business_email'          => sanitize($_POST['business_email'] ?? ''),
         'business_gstin'          => sanitize($_POST['business_gstin'] ?? ''),
         'currency_symbol'         => sanitize($_POST['currency_symbol'] ?? '₹'),
@@ -43,6 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($settings['business_name'])) {
         $errors[] = 'Business name is required.';
+    }
+    if (!empty($settings['business_phone']) && !isValidMobile($settings['business_phone'])) {
+        $errors[] = 'Business phone must be exactly 10 digits.';
     }
 
     if (empty($errors)) {
@@ -93,7 +96,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
         <div class="form-group"><label class="form-label">Tagline</label><input type="text" name="business_tagline" class="form-control" value="<?= e(getSett('business_tagline')) ?>"></div>
         <div class="form-group"><label class="form-label">Address</label><textarea name="business_address" class="form-control" rows="2"><?= e(getSett('business_address')) ?></textarea></div>
         <div class="form-row cols-2">
-          <div class="form-group"><label class="form-label">Phone</label><input type="text" name="business_phone" class="form-control" value="<?= e(getSett('business_phone')) ?>"></div>
+          <div class="form-group"><label class="form-label">Phone</label><input type="tel" name="business_phone" class="form-control" placeholder="10-digit phone number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)" value="<?= e(getSett('business_phone')) ?>"></div>
           <div class="form-group"><label class="form-label">Email</label><input type="email" name="business_email" class="form-control" value="<?= e(getSett('business_email')) ?>"></div>
         </div>
         <div class="form-group"><label class="form-label">GSTIN</label><input type="text" name="business_gstin" class="form-control" value="<?= e(getSett('business_gstin')) ?>"></div>

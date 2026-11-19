@@ -12,7 +12,7 @@ $errors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validateCSRF();
     $name    = sanitize($_POST['name'] ?? '');
-    $mobile  = sanitize($_POST['mobile'] ?? '');
+    $mobile  = cleanMobile($_POST['mobile'] ?? '');
     $email   = sanitize($_POST['email'] ?? '');
     $address = sanitize($_POST['address'] ?? '');
     $type    = sanitize($_POST['type'] ?? 'retail');
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status  = sanitize($_POST['status'] ?? 'active');
 
     if (empty($name)) $errors[] = 'Name required.';
-    if ($mobile && !preg_match('/^[0-9]{10}$/', $mobile)) $errors[] = 'Invalid mobile.';
+    if ($mobile && !isValidMobile($mobile)) $errors[] = 'Mobile number must be exactly 10 digits.';
 
     if (empty($errors)) {
         db()->execute(
@@ -51,7 +51,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
     <div class="card-body">
       <div class="form-row cols-2">
         <div class="form-group"><label class="form-label">Full Name <span class="required">*</span></label><input type="text" name="name" class="form-control" required value="<?= e($customer['name']) ?>"></div>
-        <div class="form-group"><label class="form-label">Mobile</label><input type="tel" name="mobile" class="form-control" value="<?= e($customer['mobile']??'') ?>"></div>
+        <div class="form-group"><label class="form-label">Mobile</label><input type="tel" name="mobile" class="form-control" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)" value="<?= e($customer['mobile']??'') ?>"></div>
       </div>
       <div class="form-row cols-2">
         <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-control" value="<?= e($customer['email']??'') ?>"></div>

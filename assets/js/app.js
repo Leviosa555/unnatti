@@ -456,5 +456,54 @@ function initProductSearch(inputEl, callback) {
   inputEl.addEventListener('blur', function() { setTimeout(function() { dropdown.style.display = 'none'; }, 200); });
 }
 
+// ============================================================
+// GLOBAL 10-DIGIT MOBILE NUMBER ENFORCEMENT
+// ============================================================
+(function() {
+  function isTargetPhone(el) {
+    if (!el || !el.tagName || el.tagName.toLowerCase() !== 'input') return false;
+    const type = (el.type || '').toLowerCase();
+    const name = (el.name || '').toLowerCase();
+    const id   = (el.id || '').toLowerCase();
+
+    // Skip general search / filter inputs
+    const isSearch = type === 'search' || name.includes('search') || id.includes('search') || name === 'q' || id === 'q';
+    if (isSearch) return false;
+
+    return type === 'tel' ||
+           name.includes('mobile') || name.includes('phone') ||
+           id.includes('mobile') || id.includes('phone') ||
+           el.classList.contains('phone-input') || el.classList.contains('mobile-input');
+  }
+
+  // Real-time input cleaner (handles typing, paste, drag & drop)
+  document.addEventListener('input', function(e) {
+    const el = e.target;
+    if (isTargetPhone(el)) {
+      const cleaned = el.value.replace(/\D/g, '').slice(0, 10);
+      if (el.value !== cleaned) {
+        el.value = cleaned;
+      }
+    }
+  });
+
+  // Keypress preventer (blocks non-digits from being typed)
+  document.addEventListener('keypress', function(e) {
+    const el = e.target;
+    if (isTargetPhone(el)) {
+      // Allow enter key (13), prevent non-numeric characters
+      if (e.charCode !== 0 && e.charCode !== 13 && (e.charCode < 48 || e.charCode > 57)) {
+        e.preventDefault();
+      }
+      // Block additional digits if already 10 digits and nothing is selected
+      const selStart = el.selectionStart;
+      const selEnd   = el.selectionEnd;
+      if (el.value.length >= 10 && selStart === selEnd && e.charCode >= 48 && e.charCode <= 57) {
+        e.preventDefault();
+      }
+    }
+  });
+})();
+
 // Global APP_URL (set in each page)
 window.APP_URL = window.APP_URL || '';

@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fullName      = sanitize($_POST['full_name'] ?? '');
     $username      = sanitize($_POST['username'] ?? '');
     $password      = $_POST['password'] ?? '';
-    $mobile        = sanitize($_POST['mobile'] ?? '');
+    $mobile        = cleanMobile($_POST['mobile'] ?? '');
     $email         = sanitize($_POST['email'] ?? '');
     $canEnterStock = isset($_POST['can_enter_stock']) ? 1 : 0;
     $canDiscount   = isset($_POST['can_apply_discount']) ? 1 : 0;
@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($fullName)) $errors[] = 'Full name is required.';
     if (empty($username)) $errors[] = 'Username is required.';
     if (strlen($password) < 6) $errors[] = 'Password must be at least 6 characters.';
+    if ($mobile && !isValidMobile($mobile)) $errors[] = 'Mobile number must be exactly 10 digits.';
 
     if (empty($errors)) {
         $dup = db()->fetchOne("SELECT id FROM users WHERE username=?", [$username]);
@@ -57,7 +58,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
       </div>
       <div class="form-row cols-2">
         <div class="form-group"><label class="form-label">Password <span class="required">*</span></label><input type="password" name="password" class="form-control" required minlength="6" autocomplete="new-password"><div class="form-hint">Minimum 6 characters</div></div>
-        <div class="form-group"><label class="form-label">Mobile</label><input type="tel" name="mobile" class="form-control" value="<?= e($_POST['mobile']??'') ?>"></div>
+        <div class="form-group"><label class="form-label">Mobile</label><input type="tel" name="mobile" class="form-control" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)" value="<?= e($_POST['mobile']??'') ?>"></div>
       </div>
       <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-control" value="<?= e($_POST['email']??'') ?>"></div>
     </div>

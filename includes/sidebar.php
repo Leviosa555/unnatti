@@ -13,8 +13,14 @@ $businessLogo = getSetting('business_logo', '');
 // Get active profile ('unnatti' or 'fashion_kingdom')
 $activeProfile = getActiveProfile();
 
-function isNavActive(string $path, string $current): string {
-    return (strpos($current, $path) !== false) ? ' active' : '';
+function isNavActive($paths, string $current): string {
+    $paths = (array)$paths;
+    foreach ($paths as $path) {
+        if (strpos($current, $path) !== false) {
+            return ' active';
+        }
+    }
+    return '';
 }
 ?>
 
@@ -104,17 +110,10 @@ function isNavActive(string $path, string $current): string {
                     </a>
                 </li>
 
-                <li class="nav-item<?= (isNavActive('/admin/purchases/index.php', $currentPath) || isNavActive('/admin/purchases/view.php', $currentPath)) ?>">
+                <li class="nav-item<?= isNavActive(['/admin/purchases/index.php', '/admin/purchases/view.php', '/admin/suppliers'], $currentPath) ?>">
                     <a href="<?= $appUrl ?>/admin/purchases/index.php">
-                        <span class="nav-icon"><i class="fas fa-file-invoice" style="color:#06b6d4"></i></span>
-                        <span class="nav-text">Supplier Bills History</span>
-                    </a>
-                </li>
-
-                <li class="nav-item<?= isNavActive('/admin/suppliers', $currentPath) ?>">
-                    <a href="<?= $appUrl ?>/admin/suppliers/index.php">
-                        <span class="nav-icon"><i class="fas fa-truck" style="color:#a855f7"></i></span>
-                        <span class="nav-text">Suppliers &amp; Mills Directory</span>
+                        <span class="nav-icon"><i class="fas fa-file-invoice-dollar" style="color:#06b6d4"></i></span>
+                        <span class="nav-text">Supplier Bills &amp; Directory</span>
                     </a>
                 </li>
 

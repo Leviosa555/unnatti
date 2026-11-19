@@ -228,7 +228,7 @@ function searchBillingProduct(q) {
   }
 
   billingSearchTimer = setTimeout(function() {
-    apiCall((window.APP_URL || '') + '/api/search_product.php', 'GET', { q: q })
+    apiCall((window.APP_URL || '') + '/api/search_product.php', 'GET', { q: q, item_type: 'product' })
       .then(function(res) {
         if (res.success && res.data && res.data.length > 0) {
           dropdown.innerHTML = res.data.map(function(product) {

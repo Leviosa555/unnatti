@@ -37,11 +37,11 @@ if ($purchasePrice < 0) {
     jsonError('Purchase price must be non-negative.');
 }
 
-// Helpers for SKU generation
-function quickSkuSegment($value, $fallback = 'GEN') {
+// Helpers for short, clean SKU generation
+function quickSkuSegment($value, $fallback = 'MAT', $length = 3) {
     $value = strtoupper(trim((string)$value));
     $value = preg_replace('/[^A-Z0-9]+/', '', $value);
-    return $value === '' ? $fallback : substr($value, 0, 8);
+    return $value === '' ? $fallback : substr($value, 0, $length);
 }
 
 function quickSizeSkuSegment($size) {
@@ -50,7 +50,7 @@ function quickSizeSkuSegment($size) {
         'Small' => 'S', 'Medium' => 'M', 'Large' => 'L', 'X-Large' => 'XL',
         'Roll' => 'ROLL', 'Piece' => 'PCS', 'Yard' => 'YD'
     ];
-    return $map[$size] ?? quickSkuSegment($size, 'CUST');
+    return $map[$size] ?? quickSkuSegment($size, 'CUST', 4);
 }
 
 try {
@@ -74,13 +74,10 @@ try {
     $catRow    = $categoryId ? db()->fetchOne("SELECT name FROM categories WHERE id = ?", [$categoryId]) : null;
     $subCatRow = $subCatId ? db()->fetchOne("SELECT name FROM categories WHERE id = ?", [$subCatId]) : null;
 
-    $catCode    = quickSkuSegment($catRow['name'] ?? '', 'FABRIC');
-    $subCatCode = quickSkuSegment($subCatRow['name'] ?? '', 'MAT');
-    $sizeCode   = quickSizeSkuSegment($size);
+    $matToken = $subCatRow ? quickSkuSegment($subCatRow['name'], 'MAT', 3) : quickSkuSegment($catRow['name'] ?? '', 'MAT', 3);
+    $sizeCode = quickSizeSkuSegment($size);
 
-    $sku = $catCode . '-' . $subCatCode . '-P'
-         . str_pad((string)$productId, 6, '0', STR_PAD_LEFT)
-         . '-' . $sizeCode . '-01';
+    $sku = 'MAT-' . $matToken . '-P' . str_pad((string)$productId, 3, '0', STR_PAD_LEFT) . '-' . $sizeCode;
 
     // 3. Compute pricing
     $pricing = calculatePricing($purchasePrice, $purchaseGst, $profitMarkup, $salesGst);
