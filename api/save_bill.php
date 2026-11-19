@@ -49,10 +49,9 @@ $allowedPaymentMethods = ['cash', 'upi', 'card', 'bank_transfer', 'credit', 'mix
 if (!in_array($paymentMethod, $allowedPaymentMethods)) $paymentMethod = 'cash';
 
 // ── Validate items ──────────────────────────────────
-// Selling prices are GST-INCLUSIVE (see calculatePricing()), so GST is
-// extracted from the line amount, never added on top of it.
+// GST is applied on taxable amount (selling price * qty - discount)
 $validItems    = [];
-$subtotal      = 0;   // gross amount (price × qty, GST incl.) before discounts
+$subtotal      = 0;   // gross amount (price × qty) before discounts
 $lineDiscounts = 0;   // sum of all line discounts
 foreach ($items as $item) {
     $variantId = (int)($item['variant_id'] ?? 0);
@@ -96,10 +95,11 @@ foreach ($items as $item) {
         }
     }
 
-    $gstPct    = (float)$variant['sales_gst_pct'];
-    $lineGross = round($unitPrice * $qty, 2);
-    $lineTotal = round($lineGross - $lineDiscount, 2);                     // what the customer pays (GST incl.)
-    $gstAmount = round($lineTotal * $gstPct / (100 + $gstPct), 2);         // GST contained in that amount
+    $gstPct      = (float)$variant['sales_gst_pct'];
+    $lineGross   = round($unitPrice * $qty, 2);
+    $lineTaxable = round($lineGross - $lineDiscount, 2);
+    $gstAmount   = round($lineTaxable * $gstPct / 100, 2);
+    $lineTotal   = round($lineTaxable + $gstAmount, 2);
     $subtotal      += $lineGross;
     $lineDiscounts += $lineDiscount;
 
@@ -124,8 +124,8 @@ if (empty($validItems)) jsonError('No valid items to process.');
 $additionalCharges = max(0, $additionalCharges);
 $discountAmount    = round(max(0, $discountAmount) + $lineDiscounts, 2); // bill-level + line discounts
 $subtotal    = round($subtotal, 2);
-$taxAmount   = round(array_sum(array_column($validItems, 'gst_amount')), 2); // informational: already inside prices
-$grandTotal  = round($subtotal - $discountAmount + $additionalCharges, 2);
+$taxAmount   = round(array_sum(array_column($validItems, 'gst_amount')), 2);
+$grandTotal  = round($subtotal - $discountAmount + $taxAmount + $additionalCharges, 2);
 if ($grandTotal < 0) jsonError('Discount cannot exceed the bill total.');
 // clamp
 if ($amountReceived > $grandTotal) $amountReceived = $grandTotal;

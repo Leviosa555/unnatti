@@ -238,3 +238,6 @@ Stack trace:
 [19-Nov-2026 12:51:35 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
 [19-Nov-2026 13:07:57 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_d5ca3eac4c437ace6568b4f58c48f039, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
 [19-Nov-2026 13:07:57 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[19-Nov-2026 13:55:32 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_c0a2c388dd0ad5b99ae79cc926398364, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[19-Nov-2026 13:55:32 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[19-Nov-2026 13:55:32 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] An attempt was made to access a socket in a way forbidden by its access permissions

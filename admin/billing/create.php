@@ -117,20 +117,20 @@ var canApplyDiscount = <?= canApplyDiscount() ? 'true' : 'false' ?>;
         </span>
       </div>
       <div class="card-body" style="padding:18px;">
-        <!-- Customer Name & Sale Date -->
+        <!-- Customer Name & Purchase Date -->
         <div class="form-row cols-2">
           <div class="form-group">
-            <label class="form-label">Customer Name <span class="required">*</span></label>
+            <label class="form-label">Customer Name</label>
             <div style="position:relative">
-              <input type="text" id="customerName" name="customer_name" class="form-control" required
-                     placeholder="Search customer or type name..." autocomplete="off" value="Walk-In Customer"
+              <input type="text" id="customerName" name="customer_name" class="form-control"
+                     placeholder="e.g. Walk-In Customer" autocomplete="off" value=""
                      oninput="searchCustomer(this.value)" onfocus="searchCustomer(this.value)">
               <input type="hidden" id="customerId" name="customer_id" value="">
               <div id="customerDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 12px 28px rgba(0,0,0,0.15);z-index:3000;max-height:240px;overflow-y:auto;margin-top:4px;"></div>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Sale Date</label>
+            <label class="form-label">Purchase Date <span class="required">*</span></label>
             <input type="date" name="sale_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
           </div>
         </div>
@@ -147,16 +147,10 @@ var canApplyDiscount = <?= canApplyDiscount() ? 'true' : 'false' ?>;
           </div>
         </div>
 
-        <!-- Address & GSTIN -->
-        <div class="form-row cols-2">
-          <div class="form-group">
-            <label class="form-label">Address <small class="text-muted">(Optional)</small></label>
-            <input type="text" name="customer_address" id="customerAddress" class="form-control" placeholder="Delivery / residence address">
-          </div>
-          <div class="form-group">
-            <label class="form-label">GSTIN <small class="text-muted">(Optional B2B)</small></label>
-            <input type="text" name="customer_gstin" id="customerGstin" class="form-control" placeholder="GSTIN number">
-          </div>
+        <!-- Address -->
+        <div class="form-group">
+          <label class="form-label">Address <small class="text-muted">(Optional)</small></label>
+          <input type="text" name="customer_address" id="customerAddress" class="form-control" placeholder="Delivery / residence address">
         </div>
 
         <!-- Customer Notes / Remarks -->
@@ -181,7 +175,7 @@ var canApplyDiscount = <?= canApplyDiscount() ? 'true' : 'false' ?>;
           <span class="bill-summary-value text-danger" id="summaryDiscount">₹0.00</span>
         </div>
         <div class="bill-summary-row">
-          <span class="bill-summary-label">GST (incl. in price)</span>
+          <span class="bill-summary-label">GST</span>
           <span class="bill-summary-value text-muted" id="summaryTax">₹0.00</span>
         </div>
         <div class="bill-summary-row">
@@ -422,8 +416,9 @@ function renderBillTable() {
   }
 
   tbody.innerHTML = window.billRows.map(function(row) {
-    const gstAmt = Math.round((row.selling_price - row.discount) * row.gst_pct / (100 + row.gst_pct) * row.qty * 100) / 100;
-    const lineTotal = Math.round((row.selling_price - row.discount) * row.qty * 100) / 100;
+    const taxableAmount = Math.round((row.selling_price - row.discount) * row.qty * 100) / 100;
+    const gstAmt = Math.round(taxableAmount * (row.gst_pct / 100) * 100) / 100;
+    const lineTotal = Math.round((taxableAmount + gstAmt) * 100) / 100;
 
     return '<tr id="bill-row-' + row.idx + '">' +
       '<td>' +
@@ -516,9 +511,8 @@ function updateBillSummary() {
   window.billRows.forEach(function(row) {
     const lineBase = row.selling_price * row.qty;
     const lineDiscount = row.discount * row.qty;
-    const lineAfterDiscount = lineBase - lineDiscount;
-    const gstRate = row.gst_pct / (100 + row.gst_pct);
-    const gstAmt = Math.round(lineAfterDiscount * gstRate * 100) / 100;
+    const taxableAmount = lineBase - lineDiscount;
+    const gstAmt = Math.round(taxableAmount * (row.gst_pct / 100) * 100) / 100;
 
     subtotal      += lineBase;
     totalDiscount += lineDiscount;
@@ -526,7 +520,7 @@ function updateBillSummary() {
   });
 
   const additionalCharges = parseFloat(document.getElementById('additionalCharges')?.value || 0) || 0;
-  const grandTotal = Math.round((subtotal - totalDiscount + additionalCharges) * 100) / 100;
+  const grandTotal = Math.round((subtotal - totalDiscount + totalGst + additionalCharges) * 100) / 100;
 
   setSummaryVal('summarySubtotal', '₹' + subtotal.toFixed(2));
   setSummaryVal('summaryDiscount', '₹' + totalDiscount.toFixed(2));
@@ -571,12 +565,9 @@ function submitBill(formId) {
     return;
   }
 
-  const customerName = document.getElementById('customerName')?.value?.trim();
-  if (!customerName) {
-    if (typeof showToast === 'function') showToast('Customer name is required.', 'error');
-    else alert('Customer name is required.');
-    document.getElementById('customerName')?.focus();
-    return;
+  const customerInput = document.getElementById('customerName');
+  if (customerInput && !customerInput.value.trim()) {
+    customerInput.value = 'Walk-In Customer';
   }
 
   const rowCountInput = document.getElementById('billRowCount');
@@ -643,7 +634,8 @@ function selectCustomer(cust) {
   document.getElementById('customerMobile').value = cust.mobile || '';
   document.getElementById('customerEmail').value = cust.email || '';
   document.getElementById('customerAddress').value = cust.address || '';
-  document.getElementById('customerGstin').value = cust.gstin || '';
+  const gstinEl = document.getElementById('customerGstin');
+  if (gstinEl) gstinEl.value = cust.gstin || '';
   document.getElementById('customerNotes').value = cust.notes || '';
   const dd = document.getElementById('customerDropdown');
   if (dd) dd.style.display = 'none';
@@ -663,12 +655,9 @@ function validateBillForm() {
     else alert('Please add at least one product');
     return false;
   }
-  const customerName = document.getElementById('customerName').value.trim();
-  if (!customerName) {
-    if (typeof showToast === 'function') showToast('Customer name is required', 'error');
-    else alert('Customer name is required');
-    document.getElementById('customerName').focus();
-    return false;
+  const customerInput = document.getElementById('customerName');
+  if (customerInput && !customerInput.value.trim()) {
+    customerInput.value = 'Walk-In Customer';
   }
   return true;
 }

@@ -169,6 +169,9 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
         <?php if ($sale['discount_amount'] > 0): ?>
         <tr><td colspan="7" class="text-right text-danger">Discount</td><td class="text-right text-danger">–<?= formatCurrency($sale['discount_amount']) ?></td></tr>
         <?php endif; ?>
+        <?php if ($sale['tax_amount'] > 0): ?>
+        <tr><td colspan="7" class="text-right text-muted">GST</td><td class="text-right"><?= formatCurrency($sale['tax_amount']) ?></td></tr>
+        <?php endif; ?>
         <?php if ($sale['additional_charges'] > 0): ?>
         <tr><td colspan="7" class="text-right">Additional Charges</td><td class="text-right"><?= formatCurrency($sale['additional_charges']) ?></td></tr>
         <?php endif; ?>

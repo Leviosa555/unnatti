@@ -222,7 +222,8 @@ hr {
 }
 
 .brand-icon {
-  width: 36px; height: 36px;
+  width: 36px;
+  height: 36px;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   border-radius: var(--radius);
   display: flex;
@@ -235,7 +236,8 @@ hr {
 }
 
 .brand-logo img {
-  width: 36px; height: 36px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius);
   object-fit: cover;
   flex-shrink: 0;
@@ -270,7 +272,9 @@ hr {
   scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
-.sidebar-menu { padding: 0 6px; }
+.sidebar-menu {
+  padding: 0 6px;
+}
 
 .sidebar-nav::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);

@@ -25,7 +25,7 @@ function addBillRow(product) {
     max_stock: parseInt(product.current_stock) || 0,
     qty: 1,
     discount: 0,
-    line_total: parseFloat(product.selling_price) || 0
+    line_total: Math.round(((parseFloat(product.selling_price) || 0) + (parseFloat(product.selling_price) || 0) * (parseFloat(product.sales_gst_pct) || 5) / 100) * 100) / 100
   };
 
   billRows.push(row);
@@ -46,8 +46,9 @@ function renderBillTable() {
   }
 
   tbody.innerHTML = billRows.map(function(row) {
-    const gstAmt = Math.round((row.selling_price - row.discount) * row.gst_pct / (100 + row.gst_pct) * row.qty * 100) / 100;
-    const lineTotal = Math.round((row.selling_price - row.discount) * row.qty * 100) / 100;
+    const taxableAmount = Math.round((row.selling_price - row.discount) * row.qty * 100) / 100;
+    const gstAmt = Math.round(taxableAmount * (row.gst_pct / 100) * 100) / 100;
+    const lineTotal = Math.round((taxableAmount + gstAmt) * 100) / 100;
 
     return '<tr id="bill-row-' + row.idx + '">' +
       '<td>' +
@@ -109,7 +110,9 @@ function updateRowQty(idx, newQty) {
     if (input) input.value = newQty;
   }
   row.qty = newQty;
-  row.line_total = Math.round((row.selling_price - row.discount) * newQty * 100) / 100;
+  const taxableAmount = Math.round((row.selling_price - row.discount) * newQty * 100) / 100;
+  const gstAmt = Math.round(taxableAmount * (row.gst_pct / 100) * 100) / 100;
+  row.line_total = Math.round((taxableAmount + gstAmt) * 100) / 100;
 
   // Update hidden + display
   const totalCell = document.querySelector('#bill-row-' + idx + ' .total-cell');
@@ -132,7 +135,9 @@ function updateRowDiscount(idx, discountVal) {
     discountVal = 0;
   }
   row.discount = discountVal;
-  row.line_total = Math.round((row.selling_price - discountVal) * row.qty * 100) / 100;
+  const taxableAmount = Math.round((row.selling_price - discountVal) * row.qty * 100) / 100;
+  const gstAmt = Math.round(taxableAmount * (row.gst_pct / 100) * 100) / 100;
+  row.line_total = Math.round((taxableAmount + gstAmt) * 100) / 100;
 
   const totalCell = document.querySelector('#bill-row-' + idx + ' .total-cell');
   if (totalCell) totalCell.textContent = '₹' + row.line_total.toFixed(2);
@@ -162,9 +167,8 @@ function updateBillSummary() {
   billRows.forEach(function(row) {
     const lineBase = row.selling_price * row.qty;
     const lineDiscount = row.discount * row.qty;
-    const lineAfterDiscount = lineBase - lineDiscount;
-    const gstRate = row.gst_pct / (100 + row.gst_pct);
-    const gstAmt = Math.round(lineAfterDiscount * gstRate * 100) / 100;
+    const taxableAmount = lineBase - lineDiscount;
+    const gstAmt = Math.round(taxableAmount * (row.gst_pct / 100) * 100) / 100;
 
     subtotal      += lineBase;
     totalDiscount += lineDiscount;
@@ -172,7 +176,7 @@ function updateBillSummary() {
   });
 
   const additionalCharges = parseFloat(document.getElementById('additionalCharges')?.value || 0) || 0;
-  const grandTotal = Math.round((subtotal - totalDiscount + additionalCharges) * 100) / 100;
+  const grandTotal = Math.round((subtotal - totalDiscount + totalGst + additionalCharges) * 100) / 100;
 
   setVal('summarySubtotal', '₹' + subtotal.toFixed(2));
   setVal('summaryDiscount', '₹' + totalDiscount.toFixed(2));
