@@ -334,17 +334,17 @@ function confirmDelete() {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      showToast('success', data.message || 'Product deleted successfully.');
+      showToast(data.message || 'Product deleted successfully.', 'success');
       closeModal('deleteModal');
       setTimeout(() => window.location.reload(), 700);
     } else {
-      showToast('error', data.message || 'Failed to delete product.');
+      showToast(data.message || 'Failed to delete product.', 'error');
       btn.disabled = false;
       btn.innerHTML = '<i class="fas fa-trash"></i> Delete Product';
     }
   })
   .catch(err => {
-    showToast('error', 'Network error. Could not delete product.');
+    showToast('Network error. Could not delete product.', 'error');
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-trash"></i> Delete Product';
   });

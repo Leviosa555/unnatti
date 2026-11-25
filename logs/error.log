@@ -241,3 +241,222 @@ Stack trace:
 [19-Nov-2026 13:55:32 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_c0a2c388dd0ad5b99ae79cc926398364, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
 [19-Nov-2026 13:55:32 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
 [19-Nov-2026 13:55:32 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] An attempt was made to access a socket in a way forbidden by its access permissions
+[20-Nov-2026 00:00:19 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 00:00:32 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 00:00:35 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 00:00:40 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 00:17:15 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:17:18 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:17:21 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:17:24 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:17:28 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:17:31 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:17:36 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:17:43 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:17:47 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:18:11 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:18:15 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:18:24 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:18:29 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:18:37 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:18:42 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 00:19:10 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[20-Nov-2026 01:36:47 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_4cf3b1f3e917b5309e414858bb1b8912, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[20-Nov-2026 01:36:47 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[20-Nov-2026 01:37:18 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_e1c35dc4a9993fc2a5499b8dbf7cc260, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[20-Nov-2026 01:37:18 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[20-Nov-2026 01:37:18 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] An attempt was made to access a socket in a way forbidden by its access permissions
+[20-Nov-2026 11:19:31 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 11:35:48 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 11:36:09 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 11:36:10 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 11:36:31 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 11:37:11 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 11:37:18 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 11:37:33 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 11:45:08 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 11:48:04 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 12:14:55 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 408
+[20-Nov-2026 12:45:02 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_3fb35d62179521320c7a7c9144db13bf, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[20-Nov-2026 12:45:02 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[20-Nov-2026 12:45:02 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] An attempt was made to access a socket in a way forbidden by its access permissions
+[20-Nov-2026 15:44:17 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:44:20 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:44:49 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:44:50 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:44:51 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:44:51 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:44:51 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:44:55 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:44:56 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:44:57 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:45:32 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:45:38 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:45:42 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:58:24 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 15:58:27 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 16:00:35 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 16:00:37 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 23:01:30 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 23:01:34 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 23:01:39 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 23:01:40 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 485
+[20-Nov-2026 23:02:58 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_bc29bc2ada088c14cc3ecb69276d53ba, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[20-Nov-2026 23:02:58 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[20-Nov-2026 23:02:58 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] An attempt was made to access a socket in a way forbidden by its access permissions
+[21-Nov-2026 00:21:22 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:24 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:28 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:28 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:29 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:30 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:31 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:32 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:35 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:40 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:44 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:45 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:21:48 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 516
+[21-Nov-2026 00:35:14 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_9aa6099dec15afa2f96b8398401ba937, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[21-Nov-2026 00:35:14 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[21-Nov-2026 00:35:14 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] An attempt was made to access a socket in a way forbidden by its access permissions
+[21-Nov-2026 17:07:23 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[21-Nov-2026 17:08:58 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 00:05:58 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[23-Nov-2026 00:06:03 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[23-Nov-2026 00:06:08 Asia/Kolkata] Activity log error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`mini_erp`.`activity_logs`, CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL)
+[23-Nov-2026 00:06:20 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 00:06:24 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 00:06:32 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 00:06:58 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 00:07:02 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 00:10:00 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 00:37:44 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 02:11:44 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 02:13:07 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 10:30:16 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_cbc63d34128403ae5e04143b3d55e9f5, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[23-Nov-2026 10:30:16 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[23-Nov-2026 10:30:16 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] An attempt was made to access a socket in a way forbidden by its access permissions
+[23-Nov-2026 10:41:57 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 10:42:03 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 10:44:16 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 10:48:25 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 10:48:27 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 12:15:18 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 12:16:44 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 12:23:22 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 523
+[23-Nov-2026 12:36:13 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[23-Nov-2026 12:48:08 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[23-Nov-2026 12:48:32 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[23-Nov-2026 13:07:50 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[23-Nov-2026 13:41:21 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[23-Nov-2026 13:44:55 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[23-Nov-2026 13:52:53 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[23-Nov-2026 13:53:11 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[23-Nov-2026 21:55:56 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[23-Nov-2026 23:01:44 Asia/Kolkata] PHP Fatal error:  Cannot redeclare function isEmpNavActive() (previously declared in H:\xampp\htdocs\unnatti\includes\employee_sidebar.php:10) in H:\xampp\htdocs\unnatti\includes\employee_sidebar.php on line 10
+[23-Nov-2026 23:28:43 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\employee\products\index.php on line 245
+[23-Nov-2026 23:37:05 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\employee\products\index.php on line 245
+[24-Nov-2026 00:11:35 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::lastInsertId() in H:\xampp\htdocs\unnatti\scratch\test_employee_delete.php:19
+Stack trace:
+#0 {main}
+  thrown in H:\xampp\htdocs\unnatti\scratch\test_employee_delete.php on line 19
+[24-Nov-2026 00:14:35 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::lastInsertId() in H:\xampp\htdocs\unnatti\scratch\test_employee_delete.php:19
+Stack trace:
+#0 {main}
+  thrown in H:\xampp\htdocs\unnatti\scratch\test_employee_delete.php on line 19
+[24-Nov-2026 00:32:38 Asia/Kolkata] PHP Warning:  Cannot modify header information - headers already sent by (output started at H:\xampp\htdocs\unnatti\scratch\test_api_endpoint.php:28) in H:\xampp\htdocs\unnatti\api\delete_employee.php on line 10
+[24-Nov-2026 00:32:38 Asia/Kolkata] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'avatar' in 'SELECT' in H:\xampp\htdocs\unnatti\config\database.php:46
+Stack trace:
+#0 H:\xampp\htdocs\unnatti\config\database.php(46): PDO->prepare('SELECT id, full...')
+#1 H:\xampp\htdocs\unnatti\config\database.php(53): Database->query('SELECT id, full...', Array)
+#2 H:\xampp\htdocs\unnatti\api\delete_employee.php(34): Database->fetchOne('SELECT id, full...', Array)
+#3 H:\xampp\htdocs\unnatti\scratch\test_api_endpoint.php(36): require('H:\\xampp\\htdocs...')
+#4 {main}
+  thrown in H:\xampp\htdocs\unnatti\config\database.php on line 46
+[24-Nov-2026 00:35:28 Asia/Kolkata] PHP Warning:  Cannot modify header information - headers already sent by (output started at H:\xampp\htdocs\unnatti\scratch\test_api_endpoint.php:24) in H:\xampp\htdocs\unnatti\api\delete_employee.php on line 10
+[24-Nov-2026 00:35:28 Asia/Kolkata] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'avatar' in 'SELECT' in H:\xampp\htdocs\unnatti\config\database.php:46
+Stack trace:
+#0 H:\xampp\htdocs\unnatti\config\database.php(46): PDO->prepare('SELECT id, full...')
+#1 H:\xampp\htdocs\unnatti\config\database.php(53): Database->query('SELECT id, full...', Array)
+#2 H:\xampp\htdocs\unnatti\api\delete_employee.php(34): Database->fetchOne('SELECT id, full...', Array)
+#3 H:\xampp\htdocs\unnatti\scratch\test_api_endpoint.php(45): require('H:\\xampp\\htdocs...')
+#4 {main}
+  thrown in H:\xampp\htdocs\unnatti\config\database.php on line 46
+[24-Nov-2026 00:40:38 Asia/Kolkata] PHP Warning:  Cannot modify header information - headers already sent by (output started at H:\xampp\htdocs\unnatti\scratch\debug_api.php:15) in H:\xampp\htdocs\unnatti\api\delete_employee.php on line 10
+[24-Nov-2026 00:40:38 Asia/Kolkata] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'avatar' in 'SELECT' in H:\xampp\htdocs\unnatti\config\database.php:46
+Stack trace:
+#0 H:\xampp\htdocs\unnatti\config\database.php(46): PDO->prepare('SELECT id, full...')
+#1 H:\xampp\htdocs\unnatti\config\database.php(53): Database->query('SELECT id, full...', Array)
+#2 H:\xampp\htdocs\unnatti\api\delete_employee.php(34): Database->fetchOne('SELECT id, full...', Array)
+#3 H:\xampp\htdocs\unnatti\scratch\debug_api.php(23): require('H:\\xampp\\htdocs...')
+#4 {main}
+  thrown in H:\xampp\htdocs\unnatti\config\database.php on line 46
+[24-Nov-2026 00:45:13 Asia/Kolkata] PHP Warning:  Cannot modify header information - headers already sent by (output started at H:\xampp\htdocs\unnatti\scratch\debug_api.php:15) in H:\xampp\htdocs\unnatti\api\delete_employee.php on line 10
+[24-Nov-2026 00:58:12 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\employee\products\index.php on line 245
+[24-Nov-2026 00:58:29 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\employee\billing\index.php on line 212
+[24-Nov-2026 02:19:03 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[24-Nov-2026 12:11:32 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\employee\products\index.php on line 245
+[24-Nov-2026 12:11:35 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\employee\products\index.php on line 245
+[24-Nov-2026 12:11:52 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\employee\billing\index.php on line 212
+[24-Nov-2026 12:12:29 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[24-Nov-2026 12:14:45 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[24-Nov-2026 12:48:20 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[24-Nov-2026 12:48:35 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[24-Nov-2026 12:50:52 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[24-Nov-2026 12:55:33 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[24-Nov-2026 12:56:39 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\employee\products\index.php on line 245
+[24-Nov-2026 12:57:55 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 539
+[24-Nov-2026 20:07:17 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+[24-Nov-2026 20:08:49 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+[24-Nov-2026 20:09:41 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+[24-Nov-2026 20:20:59 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[24-Nov-2026 20:23:13 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[24-Nov-2026 20:23:47 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[24-Nov-2026 20:26:05 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[24-Nov-2026 20:26:17 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[24-Nov-2026 20:34:08 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_8fdfe7634c92f0f7118d08845762a53c, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[24-Nov-2026 20:34:08 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[24-Nov-2026 20:34:08 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] An attempt was made to access a socket in a way forbidden by its access permissions
+[24-Nov-2026 20:34:36 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_c8aad5146407dbf9267851af593bc050, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[24-Nov-2026 20:34:36 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[24-Nov-2026 20:34:36 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] An attempt was made to access a socket in a way forbidden by its access permissions
+[24-Nov-2026 21:06:40 Asia/Kolkata] PHP Warning:  Undefined array key "REQUEST_METHOD" in H:\xampp\htdocs\unnatti\admin\purchases\add.php on line 13
+[24-Nov-2026 21:06:40 Asia/Kolkata] PHP Warning:  Undefined array key "REQUEST_METHOD" in H:\xampp\htdocs\unnatti\admin\purchases\consumption.php on line 66
+[24-Nov-2026 21:06:40 Asia/Kolkata] PHP Fatal error:  Cannot redeclare function isNavActive() (previously declared in H:\xampp\htdocs\unnatti\includes\sidebar.php:16) in H:\xampp\htdocs\unnatti\includes\sidebar.php on line 16
+[24-Nov-2026 21:09:28 Asia/Kolkata] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pv.variant_name' in 'SELECT' in H:\xampp\htdocs\unnatti\config\database.php:46
+Stack trace:
+#0 H:\xampp\htdocs\unnatti\config\database.php(46): PDO->prepare('SELECT \n       ...')
+#1 H:\xampp\htdocs\unnatti\config\database.php(58): Database->query('SELECT \n       ...', Array)
+#2 H:\xampp\htdocs\unnatti\scratch\test_analytics.php(36): Database->fetchAll('SELECT \n       ...', Array)
+#3 {main}
+  thrown in H:\xampp\htdocs\unnatti\config\database.php on line 46
+[24-Nov-2026 21:16:02 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[24-Nov-2026 21:16:19 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[24-Nov-2026 21:17:00 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 13:55:27 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 13:58:31 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 13:59:20 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 14:00:10 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 14:00:30 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 14:02:13 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 14:02:35 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 14:02:36 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 14:02:38 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 14:03:36 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 14:03:37 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 14:03:39 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 551
+[25-Nov-2026 14:05:33 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 546
+[25-Nov-2026 14:11:46 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 546
+[25-Nov-2026 15:08:27 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 546
+[25-Nov-2026 15:08:57 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 546
+[25-Nov-2026 15:09:16 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 546
+[25-Nov-2026 15:27:23 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 543
+[25-Nov-2026 15:28:47 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 543
+[25-Nov-2026 15:28:50 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 543
+[25-Nov-2026 15:52:57 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_6fe5d66000261fe82d38ab11165b8f0d, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[25-Nov-2026 15:52:57 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[25-Nov-2026 15:53:26 Asia/Kolkata] PHP Warning:  session_start(): open(\xampp\tmp\sess_5e57b01cb35479355926cddf4612a36a, O_RDWR) failed: Permission denied (13) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[25-Nov-2026 15:53:26 Asia/Kolkata] PHP Warning:  session_start(): Failed to read session data: files (path: \xampp\tmp) in H:\xampp\htdocs\unnatti\config\config.php on line 58
+[25-Nov-2026 15:54:03 Asia/Kolkata] DB Connection Error: SQLSTATE[HY000] [2002] An attempt was made to access a socket in a way forbidden by its access permissions
+[25-Nov-2026 16:29:52 Asia/Kolkata] PHP Warning:  Undefined array key "pages" in H:\xampp\htdocs\unnatti\admin\purchases\materials.php on line 543

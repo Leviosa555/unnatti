@@ -37,6 +37,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
   </div>
   <div class="page-header-right">
     <a href="<?= APP_URL ?>/admin/employees/edit.php?id=<?= $id ?>" class="btn btn-outline-primary btn-sm"><i class="fas fa-edit"></i> Edit</a>
+    <button type="button" class="btn btn-outline-danger btn-sm" onclick="showDeleteModal()"><i class="fas fa-trash"></i> Delete</button>
     <a href="<?= APP_URL ?>/admin/employees/index.php" class="btn btn-light btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
   </div>
 </div>
@@ -96,4 +97,82 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
     </div>
   </div>
 </div>
+
+<!-- Delete Employee Confirmation Modal -->
+<div class="modal-overlay" id="deleteEmployeeModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title" style="color:#dc2626"><i class="fas fa-user-times" style="margin-right:8px"></i>Delete Employee</span>
+      <button type="button" class="modal-close" onclick="closeDeleteModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:12px;font-size:0.95rem">Are you sure you want to delete this employee?</p>
+      <div style="background:#fef2f2;border-left:4px solid #ef4444;padding:12px 14px;border-radius:6px;margin-bottom:14px">
+        <strong style="color:#b91c1c;font-size:1.05rem"><?= e($emp['full_name']) ?></strong>
+      </div>
+      <p style="font-size:0.83rem;color:#64748b;line-height:1.45;margin:0">
+        <i class="fas fa-exclamation-triangle text-warning" style="margin-right:4px"></i> 
+        This action permanently removes the employee from the database. Their historical sales and billing records will remain safely preserved in the store audit.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" onclick="closeDeleteModal()">Cancel</button>
+      <button type="button" class="btn btn-danger" id="confirmDeleteEmpBtn" onclick="confirmDeleteEmployee()">
+        <i class="fas fa-trash"></i> Delete Employee
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showDeleteModal() {
+  const modal = document.getElementById('deleteEmployeeModal');
+  if (modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeDeleteModal() {
+  const modal = document.getElementById('deleteEmployeeModal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+function confirmDeleteEmployee() {
+  const btn = document.getElementById('confirmDeleteEmpBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner spinner-sm"></span> Deleting...';
+
+  const formData = new FormData();
+  formData.append('employee_id', <?= $id ?>);
+  formData.append('csrf_token', '<?= csrfToken() ?>');
+
+  fetch('<?= APP_URL ?>/api/delete_employee.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      showToast(data.message || 'Employee deleted successfully.', 'success');
+      closeDeleteModal();
+      setTimeout(() => {
+        window.location.href = '<?= APP_URL ?>/admin/employees/index.php';
+      }, 700);
+    } else {
+      showToast(data.message || 'Failed to delete employee.', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-trash"></i> Delete Employee';
+    }
+  })
+  .catch(err => {
+    showToast('Network error. Could not delete employee.', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-trash"></i> Delete Employee';
+  });
+}
+</script>
 <?php include dirname(dirname(__DIR__)) . '/includes/footer.php'; ?>

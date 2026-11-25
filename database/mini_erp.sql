@@ -423,6 +423,41 @@ INSERT IGNORE INTO `settings` (`setting_key`, `setting_value`, `setting_group`) 
 ('show_signature_on_invoice',  '1',                                                          'invoice');
 
 -- =====================================================
+-- TABLE: material_consumptions (Production / Cutting)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS `material_consumptions` (
+  `id`                  INT AUTO_INCREMENT PRIMARY KEY,
+  `consumption_no`      VARCHAR(50)  UNIQUE NOT NULL,
+  `production_date`     DATE         NOT NULL,
+  `garment_type`        VARCHAR(100) NOT NULL,
+  `units_produced`      INT          NOT NULL DEFAULT 0,
+  `finished_product_id` INT          DEFAULT NULL,
+  `finished_variant_id` INT          DEFAULT NULL,
+  `tailor_name`         VARCHAR(100) DEFAULT NULL,
+  `total_fabric_meters` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `notes`               TEXT,
+  `created_by`          INT          DEFAULT NULL,
+  `created_at`          TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+  INDEX (`production_date`),
+  INDEX (`garment_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================
+-- TABLE: material_consumption_items (Used materials breakdown)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS `material_consumption_items` (
+  `id`             INT AUTO_INCREMENT PRIMARY KEY,
+  `consumption_id` INT          NOT NULL,
+  `variant_id`     INT          NOT NULL,
+  `material_role`  VARCHAR(50)  DEFAULT 'fabric',
+  `qty_used`       DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `unit`           VARCHAR(20)  DEFAULT 'meters',
+  `notes`          VARCHAR(255) DEFAULT NULL,
+  FOREIGN KEY (`consumption_id`) REFERENCES `material_consumptions`(`id`) ON DELETE CASCADE,
+  INDEX (`variant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================
 -- SEED DATA: Default Walk-In Customer
 -- =====================================================
 INSERT IGNORE INTO `customers` (`name`, `mobile`, `customer_type`, `status`) VALUES

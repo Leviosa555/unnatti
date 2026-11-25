@@ -46,27 +46,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             [$name, $categoryId?:null, $imageName, $status, $id]
         );
 
-        // Update each variant pricing directly from Selling Price / MRP
+        // Update each variant pricing with complete purchase & pricing formula
         $updatedVariants = $_POST['variants'] ?? [];
-        $defSalesGst = (float)getSetting('sales_gst_pct', '5');
         foreach ($updatedVariants as $vid => $v) {
-            $sellPrice = (float)($v['selling_price'] ?? 0);
-            $size = sanitize($v['size'] ?? 'Standard');
-            $min  = (int)($v['min_stock_alert'] ?? 5);
+            $pp      = (float)($v['purchase_price'] ?? 0);
+            $pgst    = (float)($v['purchase_gst_pct'] ?? 5);
+            $prof    = (float)($v['profit_markup_pct'] ?? 65);
+            $sgst    = (float)($v['sales_gst_pct'] ?? 5);
+            $size    = sanitize($v['size'] ?? 'Medium');
+            $tag     = (float)($v['tag_price'] ?? 0);
+            $min     = (int)($v['min_stock_alert'] ?? 5);
             $vstatus = sanitize($v['status'] ?? 'active');
 
-            if ($sellPrice > 0) {
-                $sellingBeforeGst = round($sellPrice / (1 + ($defSalesGst / 100)), 2);
-                $salesGstAmount = round($sellPrice - $sellingBeforeGst, 2);
+            $pricing   = calculatePricing($pp, $pgst, $prof, $sgst);
+            $sellPrice = ($tag > 0) ? $tag : $pricing['selling_price'];
+            $tagPrice  = $sellPrice;
 
-                db()->execute(
-                    "UPDATE product_variants SET size=?, selling_price=?, tag_price=?,
-                     selling_price_before_gst=?, sales_gst_pct=?, sales_gst_amount=?,
-                     min_stock_alert=?, status=?, updated_at=NOW()
-                     WHERE id=? AND product_id=?",
-                    [$size, $sellPrice, $sellPrice, $sellingBeforeGst, $defSalesGst, $salesGstAmount, $min, $vstatus, $vid, $id]
-                );
+            if ($pp > 0 && abs($sellPrice - $pricing['selling_price']) > 0.01) {
+                $sellingBeforeGst     = (float)round($sellPrice / (1 + ($sgst / 100)));
+                $salesGstAmount       = (float)round($sellPrice - $sellingBeforeGst);
+                $purchaseGstAmount    = $pricing['purchase_gst_amount'];
+                $purchasePriceWithGst = $pricing['purchase_price_with_gst'];
+                $profitAmount         = (float)round($sellingBeforeGst - $purchasePriceWithGst);
+                $profitMarkupPct      = ($purchasePriceWithGst > 0)
+                    ? round(($profitAmount / $purchasePriceWithGst) * 100, 2)
+                    : 0;
+            } else {
+                $purchaseGstAmount    = $pricing['purchase_gst_amount'];
+                $purchasePriceWithGst = $pricing['purchase_price_with_gst'];
+                $profitAmount         = $pricing['profit_amount'];
+                $sellingBeforeGst     = $pricing['selling_price_before_gst'];
+                $salesGstAmount       = $pricing['sales_gst_amount'];
+                $profitMarkupPct      = $prof;
             }
+
+            db()->execute(
+                "UPDATE product_variants SET size=?, purchase_price=?, purchase_gst_pct=?, purchase_gst_amount=?,
+                 purchase_price_with_gst=?, profit_markup_pct=?, profit_amount=?, selling_price_before_gst=?,
+                 sales_gst_pct=?, sales_gst_amount=?, selling_price=?, tag_price=?, min_stock_alert=?, status=?, updated_at=NOW()
+                 WHERE id=? AND product_id=?",
+                [$size, $pp, $pgst, $purchaseGstAmount, $purchasePriceWithGst, $profitMarkupPct, $profitAmount,
+                 $sellingBeforeGst, $sgst, $salesGstAmount, $sellPrice, $tagPrice, $min, $vstatus, $vid, $id]
+            );
         }
 
         logActivity("Updated product: $name", 'products', $id, 'product');
@@ -161,22 +182,54 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
       <div class="card" style="height:100%;display:flex;flex-direction:column;margin-bottom:0">
         <div class="card-header" style="min-height:57px;display:flex;align-items:center"><span class="card-title"><i class="fas fa-layer-group"></i> Variants</span></div>
         <div class="card-body p-0" style="flex:1">
-        <?php foreach ($variants as $v): ?>
+        <?php foreach ($variants as $v): 
+          $margin = $v['purchase_price_with_gst'] > 0 ? round(($v['selling_price']-$v['purchase_price_with_gst'])/$v['selling_price']*100,1) : 0;
+        ?>
         <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
             <strong style="font-size:0.95rem;color:#1e293b"><i class="fas fa-barcode text-muted" style="margin-right:6px"></i><?= e($v['sku']) ?></strong>
-            <span class="badge badge-<?= $v['current_stock'] <= $v['min_stock_alert'] ? ($v['current_stock'] == 0 ? 'danger' : 'warning') : 'success' ?>">
-              Stock: <?= $v['current_stock'] ?>
-            </span>
+            <div class="d-flex align-center gap-2">
+              <span class="badge badge-<?= $margin>=20?'success':($margin>=10?'warning':'danger') ?>" id="margin-badge-<?= $v['id'] ?>"><?= $margin ?>% margin</span>
+              <span class="badge badge-<?= $v['current_stock'] <= $v['min_stock_alert'] ? ($v['current_stock'] == 0 ? 'danger' : 'warning') : 'success' ?>">
+                Stock: <?= $v['current_stock'] ?>
+              </span>
+            </div>
+          </div>
+          <div class="form-row cols-2" style="margin-bottom:10px">
+            <div class="form-group mb-0">
+              <label class="form-label text-xs">Garment Size / Unit <span class="required">*</span></label>
+              <input type="text" name="variants[<?= $v['id'] ?>][size]" class="form-control" value="<?= e($v['size']) ?>" placeholder="e.g. Medium, Large, Size 32" list="garmentSizesList" required>
+            </div>
+            <div class="form-group mb-0">
+              <label class="form-label text-xs">Status</label>
+              <select name="variants[<?= $v['id'] ?>][status]" class="form-select">
+                <option value="active" <?= $v['status']==='active'?'selected':'' ?>>Active</option>
+                <option value="inactive" <?= $v['status']==='inactive'?'selected':'' ?>>Inactive</option>
+              </select>
+            </div>
           </div>
           <div class="form-row cols-3" style="margin-bottom:10px">
             <div class="form-group mb-0">
-              <label class="form-label text-xs">Garment Size / Unit <span class="required">*</span></label>
-              <input type="text" name="variants[<?= $v['id'] ?>][size]" class="form-control" value="<?= e($v['size']) ?>" placeholder="e.g. Medium, Size 38, Piece, Set" list="garmentSizesList" required>
+              <label class="form-label text-xs">Purchase Price (₹)</label>
+              <input type="number" name="variants[<?= $v['id'] ?>][purchase_price]" class="form-control" step="1" min="0" placeholder="0" value="<?= round($v['purchase_price']) ?>" oninput="calcEdit(<?= $v['id'] ?>)">
             </div>
             <div class="form-group mb-0">
-              <label class="form-label text-xs">Selling Price / MRP (₹) <span class="required">*</span></label>
-              <input type="number" name="variants[<?= $v['id'] ?>][selling_price]" class="form-control" step="0.01" min="0" required value="<?= $v['selling_price'] ?>" style="font-weight:700;color:#2563eb">
+              <label class="form-label text-xs">Purchase GST %</label>
+              <input type="number" name="variants[<?= $v['id'] ?>][purchase_gst_pct]" class="form-control" step="0.01" min="0" value="<?= $v['purchase_gst_pct'] ?>" oninput="calcEdit(<?= $v['id'] ?>)">
+            </div>
+            <div class="form-group mb-0">
+              <label class="form-label text-xs">Profit Markup %</label>
+              <input type="number" name="variants[<?= $v['id'] ?>][profit_markup_pct]" class="form-control" step="0.01" min="0" value="<?= $v['profit_markup_pct'] ?>" oninput="calcEdit(<?= $v['id'] ?>)">
+            </div>
+          </div>
+          <div class="form-row cols-3" style="margin-bottom:10px">
+            <div class="form-group mb-0">
+              <label class="form-label text-xs">Sales GST %</label>
+              <input type="number" name="variants[<?= $v['id'] ?>][sales_gst_pct]" class="form-control" step="0.01" min="0" value="<?= $v['sales_gst_pct'] ?>" oninput="calcEdit(<?= $v['id'] ?>)">
+            </div>
+            <div class="form-group mb-0">
+              <label class="form-label text-xs">Tag / MRP (₹) <span class="required">*</span></label>
+              <input type="number" name="variants[<?= $v['id'] ?>][tag_price]" class="form-control" step="1" min="0" required value="<?= round($v['tag_price'] ?: $v['selling_price']) ?>" style="font-weight:700;color:#2563eb">
             </div>
             <div class="form-group mb-0">
               <label class="form-label text-xs">Min Stock Alert</label>
@@ -184,8 +237,8 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
             </div>
           </div>
           <div style="background:#f8fafc;border-radius:6px;padding:8px 12px;margin-top:10px;font-size:0.8rem;display:flex;justify-content:space-between;align-items:center">
-            <div style="color:#64748b">
-              Current Stock: <strong class="<?= $v['current_stock'] <= $v['min_stock_alert'] ? 'text-danger' : 'text-success' ?>"><?= $v['current_stock'] ?></strong> units
+            <div style="color:#64748b" id="edit-preview-info-<?= $v['id'] ?>">
+              Cost+GST: <strong>₹<?= number_format(round($v['purchase_price_with_gst'])) ?></strong> &bull; Current Stock: <strong class="<?= $v['current_stock'] <= $v['min_stock_alert'] ? 'text-danger' : 'text-success' ?>"><?= $v['current_stock'] ?></strong> units
             </div>
             <button type="button" class="btn btn-sm btn-outline-primary" onclick="showStockAdjustModal(<?= $v['id'] ?>, '<?= addslashes(e($v['sku'])) ?>', <?= $v['current_stock'] ?>)" title="Adjust Stock">
               <i class="fas fa-boxes"></i> Adjust Stock
@@ -201,15 +254,11 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
 </form>
 
 <datalist id="garmentSizesList">
-  <option value="Standard">
-  <option value="Free Size">
-  <option value="X-Small">
   <option value="Small">
   <option value="Medium">
   <option value="Large">
   <option value="X-Large">
   <option value="XX-Large">
-  <option value="3X-Large">
   <option value="Size 28">
   <option value="Size 30">
   <option value="Size 32">
@@ -219,9 +268,13 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
   <option value="Size 40">
   <option value="Size 42">
   <option value="Size 44">
-  <option value="Piece">
-  <option value="Set">
-  <option value="Pair">
+  <option value="Size 6">
+  <option value="Size 7">
+  <option value="Size 8">
+  <option value="Size 9">
+  <option value="Size 10">
+  <option value="Size 11">
+  <option value="Size 12">
 </datalist>
 <script>
 let adjustVariantId = null;
@@ -290,6 +343,31 @@ function confirmStockAdjust() {
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-check"></i> Adjust Stock';
   });
+}
+
+function calcEdit(id) {
+  const row = document.querySelector(`[name="variants[${id}][purchase_price]"]`)?.closest('div[style*="border-bottom"]');
+  if (!row) return;
+  const pp   = parseFloat(row.querySelector(`[name="variants[${id}][purchase_price]"]`)?.value) || 0;
+  const pgst = parseFloat(row.querySelector(`[name="variants[${id}][purchase_gst_pct]"]`)?.value) || 0;
+  const prof = parseFloat(row.querySelector(`[name="variants[${id}][profit_markup_pct]"]`)?.value) || 0;
+  const sgst = parseFloat(row.querySelector(`[name="variants[${id}][sales_gst_pct]"]`)?.value) || 0;
+
+  if (pp <= 0) return;
+  const pgstAmt   = Math.round(pp * (pgst / 100));
+  const ppWithGst = Math.round(pp + pgstAmt);
+  const profAmt   = Math.round(ppWithGst * (prof / 100));
+  const spBeforeGst = Math.round(ppWithGst + profAmt);
+  const sgstAmt   = Math.round(spBeforeGst * (sgst / 100));
+  const sellingPrice = Math.round(spBeforeGst + sgstAmt);
+
+  const tagInput = row.querySelector(`[name="variants[${id}][tag_price]"]`);
+  if (tagInput) tagInput.value = sellingPrice;
+
+  const previewInfo = document.getElementById('edit-preview-info-' + id);
+  if (previewInfo) {
+    previewInfo.innerHTML = 'Calculated Sell Price: <strong class="text-primary">₹' + sellingPrice + '</strong> &bull; Cost+GST: ₹' + ppWithGst + ' &bull; Margin: ₹' + profAmt;
+  }
 }
 </script>
 <?php include dirname(dirname(__DIR__)) . '/includes/footer.php'; ?>

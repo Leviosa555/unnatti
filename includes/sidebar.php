@@ -89,17 +89,24 @@ function isNavActive($paths, string $current): string {
                 <!-- ===================================================== -->
                 <li class="nav-section-label"><span>Supplier Operations</span></li>
 
-                <li class="nav-item<?= isNavActive('/admin/purchases/add.php', $currentPath) ?>">
-                    <a href="<?= $appUrl ?>/admin/purchases/add.php">
-                        <span class="nav-icon"><i class="fas fa-plus-circle" style="color:#10b981"></i></span>
-                        <span class="nav-text">Stock Inward Entry</span>
-                    </a>
-                </li>
-
                 <li class="nav-item<?= isNavActive('/admin/purchases/materials.php', $currentPath) ?>">
                     <a href="<?= $appUrl ?>/admin/purchases/materials.php">
                         <span class="nav-icon"><i class="fas fa-scroll" style="color:#3b82f6"></i></span>
                         <span class="nav-text">Material Stock &amp; Inventory</span>
+                    </a>
+                </li>
+
+                <li class="nav-item<?= isNavActive('/admin/purchases/consumption.php', $currentPath) ?>">
+                    <a href="<?= $appUrl ?>/admin/purchases/consumption.php">
+                        <span class="nav-icon"><i class="fas fa-cut" style="color:#ec4899"></i></span>
+                        <span class="nav-text">Material Used / Production</span>
+                    </a>
+                </li>
+
+                <li class="nav-item<?= isNavActive('/admin/purchases/add.php', $currentPath) ?>">
+                    <a href="<?= $appUrl ?>/admin/purchases/add.php">
+                        <span class="nav-icon"><i class="fas fa-plus-circle" style="color:#10b981"></i></span>
+                        <span class="nav-text">Stock Inward Entry</span>
                     </a>
                 </li>
 
@@ -117,6 +124,33 @@ function isNavActive($paths, string $current): string {
                     </a>
                 </li>
 
+                <!-- Uniform Batch Supply & Billing -->
+                <li class="nav-section-label"><span>Uniform Supply &amp; Billing</span></li>
+
+                <li class="nav-item<?= isNavActive('/admin/billing/create.php', $currentPath) ?>">
+                    <a href="<?= $appUrl ?>/admin/billing/create.php">
+                        <span class="nav-icon"><i class="fas fa-file-invoice" style="color:#8b5cf6"></i></span>
+                        <span class="nav-text">Create Bill / Supply Order</span>
+                    </a>
+                </li>
+
+                <li class="nav-item<?= isNavActive(['/admin/billing/index.php', '/admin/billing/invoice.php'], $currentPath) ?>">
+                    <a href="<?= $appUrl ?>/admin/billing/index.php">
+                        <span class="nav-icon"><i class="fas fa-receipt" style="color:#ec4899"></i></span>
+                        <span class="nav-text">All Bills &amp; Invoices</span>
+                    </a>
+                </li>
+
+                <!-- Production & Output Analytics -->
+                <li class="nav-section-label"><span>Production Analytics</span></li>
+
+                <li class="nav-item<?= isNavActive('/admin/purchases/analytics.php', $currentPath) ?>">
+                    <a href="<?= $appUrl ?>/admin/purchases/analytics.php">
+                        <span class="nav-icon"><i class="fas fa-chart-line" style="color:#10b981"></i></span>
+                        <span class="nav-text">Monthly Production Analytics</span>
+                    </a>
+                </li>
+
             <?php else: ?>
                 <!-- ===================================================== -->
                 <!-- UNNATTI PROFILE: BOUTIQUE & RETAIL                    -->
@@ -130,26 +164,7 @@ function isNavActive($paths, string $current): string {
                     </a>
                 </li>
 
-                <!-- 1. CUSTOMER -->
-                <li class="nav-section-label"><span>Customer Side</span></li>
-
-                <?php 
-                $isCustomerActive = (strpos($currentPath, '/admin/billing') !== false || strpos($currentPath, '/admin/customers') !== false);
-                ?>
-                <li class="nav-item<?= $isCustomerActive ? ' active' : '' ?> has-submenu">
-                    <a href="#" class="submenu-toggle" onclick="toggleSubmenu(this)">
-                        <span class="nav-icon"><i class="fas fa-user-tag"></i></span>
-                        <span class="nav-text">Customer</span>
-                        <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
-                    </a>
-                    <ul class="submenu <?= $isCustomerActive ? 'open' : '' ?>">
-                        <li><a href="<?= $appUrl ?>/admin/billing/create.php"><i class="fas fa-file-invoice"></i> Create Bill / Sale</a></li>
-                        <li><a href="<?= $appUrl ?>/admin/billing/index.php"><i class="fas fa-receipt"></i> All Bills History</a></li>
-                        <li><a href="<?= $appUrl ?>/admin/customers/index.php"><i class="fas fa-users"></i> Customers &amp; Purchases</a></li>
-                    </ul>
-                </li>
-
-                <!-- 2. PRODUCT (Shop In Products: Shirt, Dress, Kurta) -->
+                <!-- 1. PRODUCT & INVENTORY -->
                 <li class="nav-section-label"><span>Product &amp; Inventory</span></li>
 
                 <?php 
@@ -166,6 +181,24 @@ function isNavActive($paths, string $current): string {
                         <li><a href="<?= $appUrl ?>/admin/products/add.php"><i class="fas fa-plus"></i> Add New Product</a></li>
                         <li><a href="<?= $appUrl ?>/admin/stock/movements.php"><i class="fas fa-exchange-alt"></i> Stock Movements</a></li>
                         <li><a href="<?= $appUrl ?>/admin/inventory/adjustments.php"><i class="fas fa-sliders-h"></i> Stock Adjustments</a></li>
+                    </ul>
+                </li>
+
+                <!-- 2. SALES & BILLING -->
+                <li class="nav-section-label"><span>Sales &amp; Billing</span></li>
+
+                <?php 
+                $isBillingActive = (strpos($currentPath, '/admin/billing') !== false || strpos($currentPath, '/admin/customers') !== false);
+                ?>
+                <li class="nav-item<?= $isBillingActive ? ' active' : '' ?> has-submenu">
+                    <a href="#" class="submenu-toggle" onclick="toggleSubmenu(this)">
+                        <span class="nav-icon"><i class="fas fa-cash-register"></i></span>
+                        <span class="nav-text">Sales &amp; Billing</span>
+                        <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                    </a>
+                    <ul class="submenu <?= $isBillingActive ? 'open' : '' ?>">
+                        <li><a href="<?= $appUrl ?>/admin/billing/create.php"><i class="fas fa-file-invoice"></i> Create Bill / Sale</a></li>
+                        <li><a href="<?= $appUrl ?>/admin/billing/index.php"><i class="fas fa-receipt"></i> Bills &amp; Invoices</a></li>
                     </ul>
                 </li>
 

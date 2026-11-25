@@ -108,6 +108,13 @@ function toggleDropdown(menuId) {
 // TOASTS
 // ============================================================
 function showToast(message, type) {
+  // Gracefully handle swapped arguments: showToast('error', 'Message') vs showToast('Message', 'error')
+  if (['success', 'error', 'warning', 'info', 'danger'].includes(message) && typeof type === 'string' && type.length > 0) {
+    const temp = message;
+    message = type;
+    type = (temp === 'danger') ? 'error' : temp;
+  }
+  if (type === 'danger') type = 'error';
   type = type || 'success';
   const icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
   const icon = icons[type] || icons.info;
@@ -141,6 +148,7 @@ function openModal(id) {
   const overlay = document.getElementById(id);
   if (overlay) {
     overlay.classList.add('active');
+    overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     // Focus first input
     setTimeout(function() {
@@ -154,6 +162,7 @@ function closeModal(id) {
   const overlay = document.getElementById(id);
   if (overlay) {
     overlay.classList.remove('active');
+    overlay.style.display = 'none';
     document.body.style.overflow = '';
   }
 }
@@ -162,6 +171,7 @@ function closeModal(id) {
 document.addEventListener('click', function(e) {
   if (e.target.classList.contains('modal-overlay')) {
     e.target.classList.remove('active');
+    e.target.style.display = 'none';
     document.body.style.overflow = '';
   }
 });
@@ -169,10 +179,13 @@ document.addEventListener('click', function(e) {
 // Close modal on Escape
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-overlay.active').forEach(function(m) {
-      m.classList.remove('active');
-      document.body.style.overflow = '';
+    document.querySelectorAll('.modal-overlay').forEach(function(m) {
+      if (m.classList.contains('active') || m.style.display === 'flex' || m.style.display === 'block') {
+        m.classList.remove('active');
+        m.style.display = 'none';
+      }
     });
+    document.body.style.overflow = '';
     document.querySelectorAll('.dropdown-menu.show').forEach(function(d) { d.classList.remove('show'); });
   }
 });

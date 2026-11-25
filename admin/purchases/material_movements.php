@@ -160,7 +160,9 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
           </td>
           <td class="text-center"><span class="badge badge-info"><?= e($measure) ?></span></td>
           <td class="text-center">
-            <?php if ($m['movement_type'] === 'purchase'): ?>
+            <?php if ($m['reference_type'] === 'production_consumption'): ?>
+              <span class="badge" style="background:#fce7f3;color:#be185d;border:1px solid #fbcfe8;font-weight:600"><i class="fas fa-cut"></i> Production Used</span>
+            <?php elseif ($m['movement_type'] === 'purchase'): ?>
               <span class="badge badge-success">Inward Entry</span>
             <?php elseif ($m['movement_type'] === 'adjustment'): ?>
               <span class="badge badge-warning">Adjustment</span>

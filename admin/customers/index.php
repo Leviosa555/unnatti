@@ -4,14 +4,9 @@ require_once dirname(dirname(__DIR__)) . '/includes/auth.php';
 require_once dirname(dirname(__DIR__)) . '/includes/functions.php';
 requireAdmin();
 
-$search = sanitize($_GET['search'] ?? '');
-$type   = sanitize($_GET['type'] ?? '');
-$page   = max(1, (int)($_GET['page'] ?? 1));
-
-$where = ['c.status=\'active\'']; $params = [];
-if ($search) { $where[] = '(c.name LIKE ? OR c.mobile LIKE ? OR c.email LIKE ?)'; $s="%$search%"; $params=array_merge($params,[$s,$s,$s]); }
-if ($type)   { $where[] = 'c.customer_type=?'; $params[]=$type; }
-$w = implode(' AND ', $where);
+// Retail POS: redirect to Bills & Invoices
+header('Location: ' . APP_URL . '/admin/billing/index.php');
+exit;
 
 $total = db()->fetchOne("SELECT COUNT(*) AS c FROM customers c WHERE $w", $params)['c'];
 $pagination = paginate($total, $page);

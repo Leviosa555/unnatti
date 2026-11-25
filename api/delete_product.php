@@ -57,20 +57,7 @@ try {
     if ($purchaseCount > 0) {
         die(json_encode([
             'success' => false, 
-            'message' => 'Cannot delete product that has purchase history. Consider marking it as inactive instead.'
-        ]));
-    }
-
-    // Check if any variants have stock
-    $hasStock = db()->fetchOne(
-        "SELECT COUNT(*) AS c FROM product_variants WHERE product_id = ? AND current_stock > 0",
-        [$productId]
-    )['c'];
-
-    if ($hasStock > 0) {
-        die(json_encode([
-            'success' => false, 
-            'message' => 'Cannot delete product with stock. Please adjust stock to zero first.'
+            'message' => 'Cannot delete product that has supplier purchase history. Consider marking it as inactive instead.'
         ]));
     }
 
@@ -95,6 +82,17 @@ try {
         "DELETE sm FROM stock_movements sm
          JOIN product_variants pv ON sm.variant_id = pv.id
          WHERE pv.product_id = ?",
+        [$productId]
+    );
+    db()->execute(
+        "DELETE mci FROM material_consumption_items mci
+         JOIN product_variants pv ON mci.variant_id = pv.id
+         WHERE pv.product_id = ?",
+        [$productId]
+    );
+    db()->execute(
+        "UPDATE material_consumptions SET finished_product_id = NULL, finished_variant_id = NULL 
+         WHERE finished_product_id = ?",
         [$productId]
     );
 

@@ -8,23 +8,46 @@ require_once dirname(__DIR__) . '/config/config.php';
 require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/includes/functions.php';
 
-header('Content-Type: application/json');
 requireLogin();
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') jsonError('Method not allowed', 405);
+// Detect AJAX / JSON vs standard browser form submission
+$isJsonContent = stripos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false;
+$isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+          || (stripos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false)
+          || $isJsonContent;
+
+if ($isAjax) {
+    header('Content-Type: application/json');
+}
+
+function billError(string $message, int $code = 400) {
+    global $isAjax;
+    if (!$isAjax) {
+        $_SESSION['flash_error'] = $message;
+        $dest = $_SERVER['HTTP_REFERER'] ?? (APP_URL . '/admin/billing/create.php');
+        header('Location: ' . $dest);
+        exit;
+    }
+    jsonError($message, $code);
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') billError('Method not allowed', 405);
 
 // Accept JSON or form-encoded
 $raw  = file_get_contents('php://input');
-$post = json_decode($raw, true) ?? $_POST;
+$post = ($isJsonContent ? json_decode($raw, true) : null) ?? $_POST;
 
 validateCSRF();
 
 // ── Parse inputs ───────────────────────────────────
 $saleDate          = sanitize($post['sale_date'] ?? date('Y-m-d'));
-$customerName      = sanitize($post['customer_name'] ?? 'Walk-In Customer');
+$customerName      = trim(sanitize($post['customer_name'] ?? ''));
+if (empty($customerName)) {
+    billError('Customer Name is required and cannot be ignored.');
+}
 $customerMobile    = cleanMobile($post['customer_mobile'] ?? '');
 if ($customerMobile && !isValidMobile($customerMobile)) {
-    jsonError('Customer mobile number must be exactly 10 digits.');
+    billError('Customer mobile number must be exactly 10 digits.');
 }
 $customerAddress   = sanitize($post['customer_address'] ?? '');
 $customerEmail     = sanitize($post['customer_email'] ?? '');
@@ -42,8 +65,7 @@ if (empty($notes) && !empty($customerNotes)) {
 }
 $items             = $post['items'] ?? [];
 
-if (empty($customerName)) $customerName = 'Walk-In Customer';
-if (empty($items) || !is_array($items)) jsonError('No items in bill.');
+if (empty($items) || !is_array($items)) billError('No items in bill.');
 
 $allowedPaymentMethods = ['cash', 'upi', 'card', 'bank_transfer', 'credit', 'mixed'];
 if (!in_array($paymentMethod, $allowedPaymentMethods)) $paymentMethod = 'cash';
@@ -65,41 +87,41 @@ foreach ($items as $item) {
          WHERE pv.id = ? AND pv.status = 'active'",
         [$variantId]
     );
-    if (!$variant) jsonError("Product not found (ID: $variantId)");
+    if (!$variant) billError("Product not found (ID: $variantId)");
     if ($variant['current_stock'] < $qty) {
-        jsonError("Insufficient stock for {$variant['product_name']} [{$variant['sku']}]. Available: {$variant['current_stock']}, Requested: $qty");
+        billError("Insufficient stock for {$variant['product_name']} [{$variant['sku']}]. Available: {$variant['current_stock']}, Requested: $qty");
     }
 
     // Price always comes from the DB — never trust the browser
-    $unitPrice = (float)$variant['selling_price'];
-    if ($unitPrice <= 0) jsonError("No selling price set for {$variant['product_name']} [{$variant['sku']}].");
+    $unitPrice = (float)round($variant['selling_price']);
+    if ($unitPrice <= 0) billError("No selling price set for {$variant['product_name']} [{$variant['sku']}].");
 
     // Billing form sends discount PER UNIT as `discount`; JSON clients may send line total as `discount_amount`
     if (isset($item['discount'])) {
-        $lineDiscount = round(max(0, (float)$item['discount']) * $qty, 2);
+        $lineDiscount = (float)round(max(0, (float)$item['discount']) * $qty);
     } else {
-        $lineDiscount = round(max(0, (float)($item['discount_amount'] ?? 0)), 2);
+        $lineDiscount = (float)round(max(0, (float)($item['discount_amount'] ?? 0)));
     }
     if ($lineDiscount > $unitPrice * $qty) {
-        jsonError("Discount cannot exceed the price for {$variant['product_name']}.");
+        billError("Discount cannot exceed the price for {$variant['product_name']}.");
     }
 
     // Check discount permission
     if ($lineDiscount > 0 && !canApplyDiscount()) {
-        jsonError('You do not have permission to apply discounts.');
+        billError('You do not have permission to apply discounts.');
     }
     if (!isAdmin() && $lineDiscount > 0) {
         $maxAllowed = $unitPrice * $qty * maxDiscountPct() / 100;
         if ($lineDiscount > $maxAllowed) {
-            jsonError("Discount exceeds your allowed maximum (" . maxDiscountPct() . "%) for {$variant['product_name']}.");
+            billError("Discount exceeds your allowed maximum (" . maxDiscountPct() . "%) for {$variant['product_name']}.");
         }
     }
 
     $gstPct      = (float)$variant['sales_gst_pct'];
-    $lineGross   = round($unitPrice * $qty, 2);
-    $lineTaxable = round($lineGross - $lineDiscount, 2);
-    $gstAmount   = round($lineTaxable * $gstPct / 100, 2);
-    $lineTotal   = round($lineTaxable + $gstAmount, 2);
+    $lineGross   = (float)round($unitPrice * $qty);
+    $lineTaxable = (float)round($lineGross - $lineDiscount);
+    $gstAmount   = (float)round($lineTaxable * $gstPct / 100);
+    $lineTotal   = (float)round($lineTaxable + $gstAmount);
     $subtotal      += $lineGross;
     $lineDiscounts += $lineDiscount;
 
@@ -109,7 +131,7 @@ foreach ($items as $item) {
         'product_name_snapshot'   => $variant['product_name'],
         'size_snapshot'           => $variant['size'],
         'qty'                     => $qty,
-        'purchase_cost_snapshot'  => $variant['purchase_price_with_gst'],
+        'purchase_cost_snapshot'  => (float)round($variant['purchase_price_with_gst']),
         'selling_price_snapshot'  => $unitPrice,
         'discount_amount'         => $lineDiscount,
         'gst_pct_snapshot'        => $gstPct,
@@ -118,18 +140,19 @@ foreach ($items as $item) {
     ];
 }
 
-if (empty($validItems)) jsonError('No valid items to process.');
+if (empty($validItems)) billError('No valid items to process.');
 
-// ── Compute totals ──────────────────────────────────
-$additionalCharges = max(0, $additionalCharges);
-$discountAmount    = round(max(0, $discountAmount) + $lineDiscounts, 2); // bill-level + line discounts
-$subtotal    = round($subtotal, 2);
-$taxAmount   = round(array_sum(array_column($validItems, 'gst_amount')), 2);
-$grandTotal  = round($subtotal - $discountAmount + $taxAmount + $additionalCharges, 2);
-if ($grandTotal < 0) jsonError('Discount cannot exceed the bill total.');
+// ── Compute totals (clean whole numbers for boutique billing) ───────
+$additionalCharges = (float)round(max(0, $additionalCharges));
+$discountAmount    = (float)round(max(0, $discountAmount) + $lineDiscounts); // bill-level + line discounts
+$subtotal    = (float)round($subtotal);
+$taxAmount   = (float)round(array_sum(array_column($validItems, 'gst_amount')));
+$grandTotal  = (float)round($subtotal - $discountAmount + $taxAmount + $additionalCharges);
+if ($grandTotal < 0) billError('Discount cannot exceed the bill total.');
 // clamp
 if ($amountReceived > $grandTotal) $amountReceived = $grandTotal;
-$balanceDue  = round($grandTotal - $amountReceived, 2);
+$amountReceived = (float)round($amountReceived);
+$balanceDue  = (float)round($grandTotal - $amountReceived);
 $payStatus   = $balanceDue <= 0 ? 'paid' : ($amountReceived > 0 ? 'partial' : 'unpaid');
 
 // ── Transaction ─────────────────────────────────────
@@ -223,14 +246,9 @@ try {
 
     logActivity("Bill created: $invoiceNo (₹$grandTotal)", 'billing', $saleId, 'sale');
 
-    $redirectUrl = APP_URL . '/admin/billing/invoice.php?id=' . $saleId;
+    $redirectUrl = APP_URL . (isAdmin() ? '/admin/billing/invoice.php?id=' : '/employee/billing/invoice.php?id=') . $saleId;
 
-    // Standard HTML form submission redirects directly to the invoice; AJAX gets JSON
-    $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
-              || (strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false)
-              || !empty($raw);
-
-    if (!$isAjax && !empty($_POST)) {
+    if (!$isAjax) {
         $_SESSION['flash_success'] = "Bill $invoiceNo created successfully.";
         header('Location: ' . $redirectUrl);
         exit;
@@ -246,7 +264,7 @@ try {
 
 } catch (Exception $e) {
     db()->rollback();
-    if (!empty($_POST) && empty($raw)) {
+    if (!$isAjax) {
         $_SESSION['flash_error'] = 'Failed to save bill: ' . $e->getMessage();
         header('Location: ' . APP_URL . '/admin/billing/create.php');
         exit;

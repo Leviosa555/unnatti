@@ -26,13 +26,19 @@ $payments = db()->fetchAll("SELECT * FROM payments WHERE sale_id=? ORDER BY id",
 $cancellation = db()->fetchOne("SELECT * FROM bill_cancellations WHERE sale_id=?", [$saleId]);
 
 // Business info
-$bName    = getSetting('business_name', 'Unnatti Enterprises');
+$activeProf = getActiveProfile();
+if ($activeProf === 'fashion_kingdom') {
+    $bName    = 'Fashion Kingdom — Uniform Mills & Tailoring Hub';
+    $bFooter  = 'Thank you for partnering with Fashion Kingdom. Institutional uniform batch supply.';
+} else {
+    $bName    = getSetting('business_name', 'Unnatti Enterprises');
+    $bFooter  = getSetting('invoice_footer', 'Thank you for your business!');
+}
 $bAddress = getSetting('business_address', '');
 $bPhone   = getSetting('business_phone', '');
 $bEmail   = getSetting('business_email', '');
 $bGstin   = getSetting('business_gstin', '');
 $bLogo    = getSetting('business_logo', '');
-$bFooter  = getSetting('invoice_footer', 'Thank you for your business!');
 $bTerms   = getSetting('terms_conditions', '');
 
 $pageTitle  = 'Invoice ' . $sale['invoice_no'];
@@ -46,7 +52,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
     <h1 class="page-title">Invoice <?= e($sale['invoice_no']) ?></h1>
     <p class="page-subtitle">
       <?= billStatusBadge($sale['status']) ?>
-      <?= paymentBadge($sale['payment_status']) ?>
+      <?= paymentBadge($sale['payment_status'], $sale['status']) ?>
     </p>
   </div>
   <div class="page-header-right">
@@ -128,7 +134,7 @@ include dirname(dirname(__DIR__)) . '/includes/header.php';
     <div style="text-align:right">
       <div class="invoice-party-label">Payment</div>
       <div class="invoice-party-name"><?= ucfirst(str_replace('_',' ',$sale['payment_method'])) ?></div>
-      <div class="invoice-party-detail"><?= paymentBadge($sale['payment_status']) ?></div>
+      <div class="invoice-party-detail"><?= paymentBadge($sale['payment_status'], $sale['status']) ?></div>
     </div>
   </div>
 

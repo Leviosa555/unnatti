@@ -13,10 +13,12 @@ $pageTitle  = 'Create Bill';
 $activePage = 'create_bill';
 $breadcrumb = [['label' => 'Billing'], ['label' => 'Create Bill']];
 
-// Recent customers for autocomplete
-$recentCustomers = db()->fetchAll(
-    "SELECT id, name, mobile, email, address, customer_type, gstin, notes FROM customers WHERE status='active' AND customer_type != 'walk-in' ORDER BY name ASC LIMIT 300"
-);
+// Optional prefill when coming from Customer Modal (+ New Bill for Customer)
+$prefillCustId = (int)($_GET['customer_id'] ?? 0);
+$prefillCust = null;
+if ($prefillCustId > 0) {
+    $prefillCust = db()->fetchOne("SELECT * FROM customers WHERE id = ?", [$prefillCustId]);
+}
 
 $extraJs = '';
 include dirname(dirname(__DIR__)) . '/includes/header.php';
@@ -107,125 +109,180 @@ var canApplyDiscount = <?= canApplyDiscount() ? 'true' : 'false' ?>;
     </div>
   </div>
 
-  <!-- Bill Details Row -->
-  <div class="grid-2">
-    <!-- Customer Info -->
-    <div class="card">
-      <div class="card-header" style="padding:14px 18px;">
-        <span class="card-title" style="font-weight:700;color:#1e293b;font-size:0.95rem;">
-          <i class="fas fa-user text-primary" style="margin-right:8px;"></i> Customer Details
+<style>
+.billing-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+  margin-top: 20px;
+}
+.billing-bottom-grid .card {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: #fff;
+}
+.billing-bottom-grid .card-header {
+  padding: 13px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fff;
+}
+.billing-bottom-grid .card-body {
+  padding: 18px;
+  flex: 1;
+}
+.billing-bottom-grid .card-footer {
+  padding: 14px 18px;
+  border-top: 1px solid #f1f5f9;
+  background: #fafafa;
+}
+@media (max-width: 1200px) {
+  .billing-bottom-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .billing-bottom-grid .customer-card {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 768px) {
+  .billing-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+  .billing-bottom-grid .customer-card {
+    grid-column: auto;
+  }
+}
+</style>
+
+  <!-- Bill Details Row: Professional 3-Column Layout -->
+  <div class="billing-bottom-grid">
+    <!-- 1. Customer Details -->
+    <div class="card customer-card">
+      <div class="card-header">
+        <span class="card-title" style="font-weight:700;color:#1e293b;font-size:0.95rem;display:flex;align-items:center;">
+          <i class="fas fa-user-circle text-primary" style="margin-right:8px;"></i> Customer Details
         </span>
       </div>
-      <div class="card-body" style="padding:18px;">
+      <div class="card-body">
         <!-- Customer Name & Purchase Date -->
-        <div class="form-row cols-2">
-          <div class="form-group">
-            <label class="form-label">Customer Name</label>
-            <div style="position:relative">
-              <input type="text" id="customerName" name="customer_name" class="form-control"
-                     placeholder="e.g. Walk-In Customer" autocomplete="off" value=""
-                     oninput="searchCustomer(this.value)" onfocus="searchCustomer(this.value)">
-              <input type="hidden" id="customerId" name="customer_id" value="">
-              <div id="customerDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 12px 28px rgba(0,0,0,0.15);z-index:3000;max-height:240px;overflow-y:auto;margin-top:4px;"></div>
-            </div>
+        <div class="form-row cols-2" style="margin-bottom:12px;">
+          <div class="form-group mb-0">
+            <label class="form-label">Customer Name <span class="required" style="color:#ef4444">*</span></label>
+            <input type="text" id="customerName" name="customer_name" class="form-control"
+                   placeholder="Enter customer name..." autocomplete="off" value="<?= e($prefillCust['name'] ?? '') ?>" required
+                   oninput="this.style.borderColor='';">
+            <input type="hidden" id="customerId" name="customer_id" value="<?= e($prefillCust['id'] ?? '') ?>">
           </div>
-          <div class="form-group">
+          <div class="form-group mb-0">
             <label class="form-label">Purchase Date <span class="required">*</span></label>
             <input type="date" name="sale_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
           </div>
         </div>
 
         <!-- Mobile & Email -->
-        <div class="form-row cols-2">
-          <div class="form-group">
+        <div class="form-row cols-2" style="margin-bottom:12px;">
+          <div class="form-group mb-0">
             <label class="form-label">Mobile Number</label>
-            <input type="tel" name="customer_mobile" id="customerMobile" class="form-control" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
+            <input type="tel" name="customer_mobile" id="customerMobile" class="form-control" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" value="<?= e($prefillCust['mobile'] ?? '') ?>" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
           </div>
-          <div class="form-group">
+          <div class="form-group mb-0">
             <label class="form-label">Email <small class="text-muted">(Optional)</small></label>
-            <input type="email" name="customer_email" id="customerEmail" class="form-control" placeholder="customer@example.com">
+            <input type="email" name="customer_email" id="customerEmail" class="form-control" placeholder="customer@example.com" value="<?= e($prefillCust['email'] ?? '') ?>">
           </div>
         </div>
 
         <!-- Address -->
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom:12px;">
           <label class="form-label">Address <small class="text-muted">(Optional)</small></label>
-          <input type="text" name="customer_address" id="customerAddress" class="form-control" placeholder="Delivery / residence address">
+          <input type="text" name="customer_address" id="customerAddress" class="form-control" placeholder="Delivery / residence address" value="<?= e($prefillCust['address'] ?? '') ?>">
         </div>
 
-        <!-- Customer Notes / Remarks -->
+        <!-- Customer Order Notes / Remarks -->
         <div class="form-group mb-0">
-          <label class="form-label">Customer Order Notes / Fitting remarks <small class="text-muted">(Optional)</small></label>
-          <input type="text" name="customer_notes" id="customerNotes" class="form-control" placeholder="e.g. Uniform batch reference, alteration remarks, measurements note">
+          <label class="form-label">Customer Order Notes / Remarks <small class="text-muted">(Optional)</small></label>
+          <input type="text" name="customer_notes" id="customerNotes" class="form-control" placeholder="e.g. Alteration remarks, measurements, batch reference" value="<?= e($prefillCust['notes'] ?? '') ?>">
         </div>
       </div>
     </div>
 
-    <!-- Payment & Summary -->
-    <div>
-      <!-- Summary -->
-      <div class="bill-summary" style="margin-bottom:16px">
-        <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:14px;color:#1e293b"><i class="fas fa-calculator" style="margin-right:6px;color:#2563eb"></i>Bill Summary</h4>
-        <div class="bill-summary-row">
+    <!-- 2. Payment Details -->
+    <div class="card payment-card">
+      <div class="card-header">
+        <span class="card-title" style="font-weight:700;color:#1e293b;font-size:0.95rem;display:flex;align-items:center;">
+          <i class="fas fa-credit-card text-success" style="margin-right:8px;"></i> Payment Details
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label">Payment Method</label>
+          <select name="payment_method" class="form-select">
+            <option value="cash">💵 Cash</option>
+            <option value="upi">📱 UPI</option>
+            <option value="card">💳 Card</option>
+            <option value="bank_transfer">🏦 Bank Transfer</option>
+            <option value="credit">📋 Credit / Due</option>
+          </select>
+        </div>
+
+        <div class="form-row cols-2" style="margin-bottom:14px;">
+          <div class="form-group mb-0">
+            <label class="form-label">Additional Charges (₹)</label>
+            <input type="number" id="additionalCharges" name="additional_charges" class="form-control" step="0.01" min="0" value="0">
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label">Amount Received (₹)</label>
+            <input type="number" id="amountReceived" name="amount_received" class="form-control" step="0.01" min="0" value="0">
+          </div>
+        </div>
+
+        <!-- Balance Due / Settlement Indicator -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;margin-top:16px;">
+          <div>
+            <span id="balanceLabel" style="font-weight:700;font-size:0.85rem;color:#475569;display:block">Balance Due</span>
+            <small class="text-muted" style="font-size:0.75rem">Customer balance status</small>
+          </div>
+          <span id="balanceDisplay" style="font-weight:800;font-size:1.15rem;color:#dc2626">₹0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Bill Summary & Checkout -->
+    <div class="card summary-card">
+      <div class="card-header">
+        <span class="card-title" style="font-weight:700;color:#1e293b;font-size:0.95rem;display:flex;align-items:center;">
+          <i class="fas fa-calculator text-primary" style="margin-right:8px;"></i> Bill Summary
+        </span>
+      </div>
+      <div class="card-body" style="padding:16px 18px;">
+        <div class="bill-summary-row" style="padding:5px 0;">
           <span class="bill-summary-label">Subtotal</span>
           <span class="bill-summary-value" id="summarySubtotal">₹0.00</span>
         </div>
-        <div class="bill-summary-row">
+        <div class="bill-summary-row" style="padding:5px 0;">
           <span class="bill-summary-label">Discount</span>
           <span class="bill-summary-value text-danger" id="summaryDiscount">₹0.00</span>
         </div>
-        <div class="bill-summary-row">
+        <div class="bill-summary-row" style="padding:5px 0;">
           <span class="bill-summary-label">GST</span>
           <span class="bill-summary-value text-muted" id="summaryTax">₹0.00</span>
         </div>
-        <div class="bill-summary-row">
+        <div class="bill-summary-row" style="padding:5px 0;">
           <span class="bill-summary-label">Additional Charges</span>
           <span class="bill-summary-value" id="summaryCharges">₹0.00</span>
         </div>
-        <div class="bill-summary-row total">
-          <span>Grand Total</span>
-          <span class="amount" id="summaryTotal">₹0.00</span>
+        <div class="bill-summary-row total" style="margin-top:10px;padding-top:12px;border-top:2px solid #e2e8f0;">
+          <span style="font-size:1rem;font-weight:700;color:#0f172a">Grand Total</span>
+          <span class="amount" id="summaryTotal" style="font-size:1.3rem;font-weight:800;color:#2563eb">₹0.00</span>
         </div>
       </div>
-
-      <!-- Payment -->
-      <div class="card">
-        <div class="card-header"><span class="card-title"><i class="fas fa-credit-card"></i> Payment</span></div>
-        <div class="card-body">
-          <div class="form-group">
-            <label class="form-label">Payment Method</label>
-            <select name="payment_method" class="form-select">
-              <option value="cash">💵 Cash</option>
-              <option value="upi">📱 UPI</option>
-              <option value="card">💳 Card</option>
-              <option value="bank_transfer">🏦 Bank Transfer</option>
-              <option value="credit">📋 Credit / Due</option>
-            </select>
-          </div>
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label class="form-label">Additional Charges (₹)</label>
-              <input type="number" id="additionalCharges" name="additional_charges" class="form-control" step="0.01" min="0" value="0">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Amount Received (₹)</label>
-              <input type="number" id="amountReceived" name="amount_received" class="form-control" step="0.01" min="0" value="0">
-            </div>
-          </div>
-          <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
-            <span id="balanceLabel" style="font-weight:600;color:#64748b">Balance Due:</span>
-            <span id="balanceDisplay" style="font-weight:700;font-size:1.05rem;color:#dc2626">₹0.00</span>
-          </div>
-          <div class="form-group mt-3 mb-0">
-            <label class="form-label">Notes</label>
-            <textarea name="notes" class="form-control" rows="2" placeholder="Optional remarks..."></textarea>
-          </div>
-        </div>
-        <div class="card-footer">
-          <button type="button" class="btn btn-success btn-lg w-100" onclick="submitBill('billForm')">
-            <i class="fas fa-save"></i> Save Bill &amp; Generate Invoice
-          </button>
-        </div>
+      <div class="card-footer" style="padding:14px 18px;background:#f8fafc;border-top:1px solid #f1f5f9;">
+        <button type="button" class="btn btn-success btn-lg w-100" onclick="submitBill('billForm')" style="font-weight:700;padding:12px 16px;font-size:0.95rem;box-shadow:0 4px 12px rgba(16,185,129,0.25);">
+          <i class="fas fa-check-circle" style="margin-right:6px;"></i> Save Bill &amp; Generate Invoice
+        </button>
       </div>
     </div>
   </div>
@@ -289,7 +346,7 @@ function searchBillingProduct(q) {
                          (product.brand ? ' <span style="color:#7c3aed;font-size:0.8rem;font-weight:500;">(' + escapeHtml(product.brand) + ')</span>' : '') +
                        '</div>' +
                        '<div style="font-weight:700;color:#2563eb;font-size:0.92rem">' +
-                         '₹' + parseFloat(product.selling_price).toFixed(2) +
+                         '₹' + Math.round(parseFloat(product.selling_price) || 0) +
                        '</div>' +
                      '</div>' +
                      '<div style="margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:0.75rem;">' +
@@ -416,9 +473,11 @@ function renderBillTable() {
   }
 
   tbody.innerHTML = window.billRows.map(function(row) {
-    const taxableAmount = Math.round((row.selling_price - row.discount) * row.qty * 100) / 100;
-    const gstAmt = Math.round(taxableAmount * (row.gst_pct / 100) * 100) / 100;
-    const lineTotal = Math.round((taxableAmount + gstAmt) * 100) / 100;
+    const unitPrice = Math.round(row.selling_price);
+    const unitDiscount = Math.round(row.discount || 0);
+    const taxableAmount = Math.round((unitPrice - unitDiscount) * row.qty);
+    const gstAmt = Math.round(taxableAmount * (row.gst_pct / 100));
+    const lineTotal = Math.round(taxableAmount + gstAmt);
 
     return '<tr id="bill-row-' + row.idx + '">' +
       '<td>' +
@@ -435,7 +494,7 @@ function renderBillTable() {
         '<input type="hidden" name="items[' + row.idx + '][gst_pct]" value="' + row.gst_pct + '">' +
       '</td>' +
       '<td class="text-right">' +
-        '<span class="price-cell">₹' + row.selling_price.toFixed(2) + '</span>' +
+        '<span class="price-cell">₹' + unitPrice + '</span>' +
       '</td>' +
       '<td class="text-center">' +
         '<input type="number" class="form-control qty-input" min="1" max="' + row.max_stock + '" value="' + row.qty + '" ' +
@@ -444,16 +503,16 @@ function renderBillTable() {
         '<div style="font-size:0.7rem;color:#64748b;margin-top:3px">Max: ' + row.max_stock + '</div>' +
       '</td>' +
       '<td class="text-right">' +
-        '<input type="number" class="form-control qty-input" min="0" max="' + row.selling_price + '" step="0.01" value="' + row.discount.toFixed(2) + '" ' +
+        '<input type="number" class="form-control qty-input" min="0" max="' + unitPrice + '" step="1" value="' + unitDiscount + '" ' +
           'name="items[' + row.idx + '][discount]" style="width:85px;display:inline-block;text-align:right;" ' +
           'onchange="updateRowDiscount(' + row.idx + ', this.value)" ' +
           (window.canApplyDiscount ? '' : 'disabled') + '>' +
       '</td>' +
       '<td class="text-right text-muted" style="font-size:0.82rem">' +
-        row.gst_pct + '%<br><small>₹' + gstAmt.toFixed(2) + '</small>' +
+        row.gst_pct + '%<br><small>₹' + gstAmt + '</small>' +
       '</td>' +
       '<td class="text-right">' +
-        '<span class="total-cell" style="font-weight:700">₹' + lineTotal.toFixed(2) + '</span>' +
+        '<span class="total-cell" style="font-weight:700">₹' + lineTotal + '</span>' +
         '<input type="hidden" name="items[' + row.idx + '][line_total]" value="' + lineTotal + '">' +
       '</td>' +
       '<td class="text-center">' +
@@ -509,24 +568,26 @@ function updateBillSummary() {
   let totalGst = 0;
 
   window.billRows.forEach(function(row) {
-    const lineBase = row.selling_price * row.qty;
-    const lineDiscount = row.discount * row.qty;
+    const unitPrice = Math.round(row.selling_price);
+    const unitDiscount = Math.round(row.discount || 0);
+    const lineBase = unitPrice * row.qty;
+    const lineDiscount = unitDiscount * row.qty;
     const taxableAmount = lineBase - lineDiscount;
-    const gstAmt = Math.round(taxableAmount * (row.gst_pct / 100) * 100) / 100;
+    const gstAmt = Math.round(taxableAmount * (row.gst_pct / 100));
 
     subtotal      += lineBase;
     totalDiscount += lineDiscount;
     totalGst      += gstAmt;
   });
 
-  const additionalCharges = parseFloat(document.getElementById('additionalCharges')?.value || 0) || 0;
-  const grandTotal = Math.round((subtotal - totalDiscount + totalGst + additionalCharges) * 100) / 100;
+  const additionalCharges = Math.round(parseFloat(document.getElementById('additionalCharges')?.value || 0) || 0);
+  const grandTotal = Math.round(subtotal - totalDiscount + totalGst + additionalCharges);
 
-  setSummaryVal('summarySubtotal', '₹' + subtotal.toFixed(2));
-  setSummaryVal('summaryDiscount', '₹' + totalDiscount.toFixed(2));
-  setSummaryVal('summaryTax', '₹' + totalGst.toFixed(2));
-  setSummaryVal('summaryCharges', '₹' + additionalCharges.toFixed(2));
-  setSummaryVal('summaryTotal', '₹' + grandTotal.toFixed(2));
+  setSummaryVal('summarySubtotal', '₹' + subtotal);
+  setSummaryVal('summaryDiscount', '₹' + totalDiscount);
+  setSummaryVal('summaryTax', '₹' + totalGst);
+  setSummaryVal('summaryCharges', '₹' + additionalCharges);
+  setSummaryVal('summaryTotal', '₹' + grandTotal);
   setSummaryVal('summaryItemCount', window.billRows.length + ' item(s)');
 
   const hiddenGT = document.getElementById('grandTotalHidden');
@@ -536,10 +597,10 @@ function updateBillSummary() {
 }
 
 function updateBalance() {
-  const grandTotal = parseFloat(document.getElementById('grandTotalHidden')?.value || 0);
-  const received = parseFloat(document.getElementById('amountReceived')?.value || 0);
-  const balance = Math.round((grandTotal - received) * 100) / 100;
-  setSummaryVal('balanceDisplay', '₹' + Math.abs(balance).toFixed(2));
+  const grandTotal = Math.round(parseFloat(document.getElementById('grandTotalHidden')?.value || 0) || 0);
+  const received = Math.round(parseFloat(document.getElementById('amountReceived')?.value || 0) || 0);
+  const balance = Math.round(grandTotal - received);
+  setSummaryVal('balanceDisplay', '₹' + Math.abs(balance));
   const balanceEl = document.getElementById('balanceDisplay');
   if (balanceEl) {
     balanceEl.style.color = balance > 0 ? '#dc2626' : '#059669';
@@ -566,8 +627,14 @@ function submitBill(formId) {
   }
 
   const customerInput = document.getElementById('customerName');
-  if (customerInput && !customerInput.value.trim()) {
-    customerInput.value = 'Walk-In Customer';
+  if (!customerInput || !customerInput.value.trim()) {
+    if (typeof showToast === 'function') showToast('Customer Name is required and cannot be empty.', 'error');
+    else alert('Customer Name is required and cannot be empty.');
+    if (customerInput) {
+      customerInput.focus();
+      customerInput.style.borderColor = '#ef4444';
+    }
+    return;
   }
 
   const rowCountInput = document.getElementById('billRowCount');
@@ -576,78 +643,47 @@ function submitBill(formId) {
   const submitBtn = form.querySelector('button[onclick*="submitBill"]') || form.querySelector('[type=submit]');
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i> Generating Invoice...';
   }
 
-  form.submit();
+  const formData = new FormData(form);
+  fetch(form.action, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json'
+    }
+  })
+  .then(function(res) {
+    if (res.redirected) {
+      window.location.href = res.url;
+      return null;
+    }
+    return res.json();
+  })
+  .then(function(data) {
+    if (!data) return;
+    if (data.success && data.data && data.data.redirect) {
+      window.location.href = data.data.redirect;
+    } else if (data.success && data.data && data.data.sale_id) {
+      window.location.href = window.APP_URL + '/admin/billing/invoice.php?id=' + data.data.sale_id;
+    } else {
+      if (typeof showToast === 'function') showToast(data.message || 'Error saving bill', 'error');
+      else alert(data.message || 'Error saving bill');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px;"></i> Save Bill &amp; Generate Invoice';
+      }
+    }
+  })
+  .catch(function(err) {
+    console.warn('Fetch submission error, falling back to form submit:', err);
+    form.submit();
+  });
 }
 
-// ── CUSTOMER AUTOCOMPLETE ─────────────────────────────
-const customers = <?= json_encode($recentCustomers) ?>;
 
-function searchCustomer(q) {
-  const dropdown = document.getElementById('customerDropdown');
-  if (!dropdown) return;
-
-  q = (q || '').trim();
-  if (q.toLowerCase() === 'walk-in customer') {
-    dropdown.style.display = 'none';
-    return;
-  }
-
-  const results = (!q) 
-    ? customers.slice(0, 8) 
-    : customers.filter(function(c) {
-        return (c.name && c.name.toLowerCase().includes(q.toLowerCase())) ||
-               (c.mobile && c.mobile.includes(q)) ||
-               (c.email && c.email.toLowerCase().includes(q.toLowerCase()));
-      }).slice(0, 10);
-
-  if (!results.length) {
-    dropdown.style.display = 'none';
-    return;
-  }
-
-  dropdown.innerHTML = results.map(function(c, cIdx) {
-    return '<div onclick="selectCustomerByIndex(' + cIdx + ')" ' +
-           'style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f1f5f9;font-size:0.85rem;" ' +
-           'onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'\'">' +
-        '<div style="font-weight:600;color:#1e293b;">' + escapeHtml(c.name) + '</div>' +
-        '<div style="color:#64748b;font-size:0.76rem;margin-top:2px;">' +
-          (c.mobile ? '<i class="fas fa-phone-alt"></i> ' + escapeHtml(c.mobile) : '<span style="color:#94a3b8">No mobile</span>') +
-          (c.address ? ' &bull; ' + escapeHtml(c.address) : '') +
-        '</div>' +
-      '</div>';
-  }).join('');
-  dropdown.style.display = 'block';
-}
-
-function selectCustomerByIndex(cIdx) {
-  const cust = customers[cIdx];
-  if (cust) selectCustomer(cust);
-}
-
-function selectCustomer(cust) {
-  if (!cust) return;
-  document.getElementById('customerId').value = cust.id || '';
-  document.getElementById('customerName').value = cust.name || '';
-  document.getElementById('customerMobile').value = cust.mobile || '';
-  document.getElementById('customerEmail').value = cust.email || '';
-  document.getElementById('customerAddress').value = cust.address || '';
-  const gstinEl = document.getElementById('customerGstin');
-  if (gstinEl) gstinEl.value = cust.gstin || '';
-  document.getElementById('customerNotes').value = cust.notes || '';
-  const dd = document.getElementById('customerDropdown');
-  if (dd) dd.style.display = 'none';
-}
-
-document.addEventListener('click', function(e) {
-  const dd = document.getElementById('customerDropdown');
-  const input = document.getElementById('customerName');
-  if (dd && !dd.contains(e.target) && e.target !== input) {
-    dd.style.display = 'none';
-  }
-});
 
 function validateBillForm() {
   if (window.billRows.length === 0) {
@@ -656,8 +692,14 @@ function validateBillForm() {
     return false;
   }
   const customerInput = document.getElementById('customerName');
-  if (customerInput && !customerInput.value.trim()) {
-    customerInput.value = 'Walk-In Customer';
+  if (!customerInput || !customerInput.value.trim()) {
+    if (typeof showToast === 'function') showToast('Customer Name is required and cannot be empty.', 'error');
+    else alert('Customer Name is required and cannot be empty.');
+    if (customerInput) {
+      customerInput.focus();
+      customerInput.style.borderColor = '#ef4444';
+    }
+    return false;
   }
   return true;
 }

@@ -28,24 +28,16 @@ function calculatePricing(
     float $salesGstPct,
     int   $qty = 1
 ): array {
-    // Step 1: Purchase GST
-    $purchaseGstAmount     = round($purchasePrice * $purchaseGstPct / 100, 2);
-    // Step 2: Purchase price incl. GST
-    $purchasePriceWithGst  = round($purchasePrice + $purchaseGstAmount, 2);
-    // Step 3: Total purchase value
-    $totalPurchaseValue    = round($purchasePriceWithGst * $qty, 2);
-    // Step 4: Profit amount
-    $profitAmount          = round($purchasePriceWithGst * $profitMarkupPct / 100, 2);
-    // Step 5: Selling price before GST
-    $sellingPriceBeforeGst = round($purchasePriceWithGst + $profitAmount, 2);
-    // Step 6: Sales GST amount
-    $salesGstAmount        = round($sellingPriceBeforeGst * $salesGstPct / 100, 2);
-    // Step 7: Final selling price
-    $sellingPrice          = round($sellingPriceBeforeGst + $salesGstAmount, 2);
-    // Step 8: Total selling value
-    $totalSellingValue     = round($sellingPrice * $qty, 2);
-    // Step 9: Gross profit
-    $grossProfit           = round($totalSellingValue - $totalPurchaseValue, 2);
+    // Unnatti boutique uses clean whole numbers (no float decimals like .07)
+    $purchaseGstAmount     = (float)round($purchasePrice * $purchaseGstPct / 100);
+    $purchasePriceWithGst  = (float)round($purchasePrice + $purchaseGstAmount);
+    $totalPurchaseValue    = (float)round($purchasePriceWithGst * $qty);
+    $profitAmount          = (float)round($purchasePriceWithGst * $profitMarkupPct / 100);
+    $sellingPriceBeforeGst = (float)round($purchasePriceWithGst + $profitAmount);
+    $salesGstAmount        = (float)round($sellingPriceBeforeGst * $salesGstPct / 100);
+    $sellingPrice          = (float)round($sellingPriceBeforeGst + $salesGstAmount);
+    $totalSellingValue     = (float)round($sellingPrice * $qty);
+    $grossProfit           = (float)round($totalSellingValue - $totalPurchaseValue);
 
     return [
         'purchase_price'           => $purchasePrice,
@@ -202,10 +194,11 @@ function logActivity(string $action, string $module = '', int $referenceId = 0, 
 // FORMATTING UTILITIES
 // =====================================================
 
-/** Format amount as Indian currency */
+/** Format amount as Indian currency (whole number rounded, no float decimals) */
 function formatCurrency(float $amount, bool $showSymbol = true): string {
     $symbol   = $showSymbol ? getSetting('currency_symbol', '₹') : '';
-    $formatted = number_format($amount, 2);
+    // Unnatti boutique uses clean whole numbers (no float decimals like .07)
+    $formatted = number_format(round($amount));
     return $symbol . $formatted;
 }
 
@@ -249,21 +242,20 @@ function stockBadge(int $stock, int $minAlert = 5): string {
 /**
  * Get payment status badge
  */
-function paymentBadge(string $status): string {
+function paymentBadge(string $status, string $billStatus = 'active'): string {
+    if ($billStatus === 'returned' || $status === 'refunded') {
+        return '<span class="badge" style="background:#ede9fe; color:#6d28d9; border:1px solid #ddd6fe; font-weight:600;"><i class="fas fa-undo" style="font-size:0.65rem; margin-right:3px;"></i>Refunded</span>';
+    }
 
     switch ($status) {
-
         case 'paid':
             return '<span class="badge badge-success">Paid</span>';
-
         case 'partial':
             return '<span class="badge badge-warning">Partial</span>';
-
         case 'unpaid':
             return '<span class="badge badge-danger">Unpaid</span>';
-
         default:
-            return '<span class="badge badge-secondary">' . e($status) . '</span>';
+            return '<span class="badge badge-secondary">' . e(ucfirst($status)) . '</span>';
     }
 }
 
@@ -272,20 +264,15 @@ function paymentBadge(string $status): string {
  * Get bill status badge
  */
 function billStatusBadge(string $status): string {
-
     switch ($status) {
-
         case 'active':
-            return '<span class="badge badge-success">Active</span>';
-
+            return '<span class="badge badge-success">Sold</span>';
         case 'returned':
             return '<span class="badge badge-warning">Returned</span>';
-
         case 'cancelled':
             return '<span class="badge badge-danger">Cancelled</span>';
-
         default:
-            return '<span class="badge badge-secondary">' . e($status) . '</span>';
+            return '<span class="badge badge-secondary">' . e(ucfirst($status)) . '</span>';
     }
 }
 

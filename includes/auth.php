@@ -29,10 +29,31 @@ function isAdmin(): bool {
     return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 }
 
-/** Require admin — redirect employees to their dashboard */
+/** Require admin — redirect employees to their employee portal */
 function requireAdmin(): void {
     requireLogin();
     if (!isAdmin()) {
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        if (strpos($uri, '/admin/products/add.php') !== false) {
+            header('Location: ' . APP_URL . '/employee/products/add.php');
+            exit;
+        }
+        if (strpos($uri, '/admin/products') !== false) {
+            header('Location: ' . APP_URL . '/employee/products/index.php');
+            exit;
+        }
+        if (strpos($uri, '/admin/billing/create.php') !== false) {
+            header('Location: ' . APP_URL . '/employee/billing/create.php');
+            exit;
+        }
+        if (strpos($uri, '/admin/billing') !== false) {
+            header('Location: ' . APP_URL . '/employee/billing/index.php');
+            exit;
+        }
+        if (strpos($uri, '/admin/settings') !== false) {
+            header('Location: ' . APP_URL . '/employee/settings/index.php');
+            exit;
+        }
         header('Location: ' . APP_URL . '/employee/dashboard.php');
         exit;
     }
